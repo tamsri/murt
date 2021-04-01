@@ -61,7 +61,7 @@ static PyObject *RayTracerObjectNew(PyTypeObject *type, PyObject *args, PyObject
         //printf("vert: n=%lu, m=%lu\n", vert_dim_n, vert_dim_m);
         //printf("tria: n=%lu, m=%lu\n", tri_dim_n, tri_dim_m);
         if (vert_dim_m != 3 || tri_dim_m != 3)
-            return NULL; // invalid input TODO: maybe, bug it later.
+            return NULL; // invalid input TODO[?]: maybe, bug it later.
 
         // TODO[]: Convert objects into vector<Triangle *> triangles
         std::unordered_map<size_t, Vec3> vertices_dict;
@@ -84,7 +84,7 @@ static PyObject *RayTracerObjectNew(PyTypeObject *type, PyObject *args, PyObject
             //printf("Triangle #%lu => %lu, %lu, %lu\n", i, p1Idx, p2Idx, p3Idx);
             Vec3 p1Pos = vertices_dict[p1Idx];
             Vec3 p2Pos = vertices_dict[p2Idx];
-            Vec3 p3Pos = vertices_dict[p2Idx];
+            Vec3 p3Pos = vertices_dict[p3Idx];
 
             triangles.push_back(new Triangle(p1Pos, p2Pos, p3Pos));
         }
@@ -92,7 +92,6 @@ static PyObject *RayTracerObjectNew(PyTypeObject *type, PyObject *args, PyObject
         // TODO[]: Send triangles to ray tracer
         self->tracer = new Tracer(triangles);
     }
-
     return (PyObject *)self;
 }
 

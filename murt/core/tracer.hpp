@@ -8,6 +8,7 @@ public:
     static unsigned int global_id;
     BVH *scene_;
     std::vector<Triangle *> triangles_;
+
     // TODO[]: Initialie Tracer
     Tracer(std::vector<Triangle *> &triangles) : id_(global_id++)
     {

@@ -25,8 +25,10 @@ import numpy as np
 
 
 def main():
-    core_module = Extension('murt.core', sources=[
-                            'murt/core/core.cpp'], include_dirs=[np.get_include()])
+    core_module = Extension('murt.core',
+                            sources=['murt/core/core.cpp'],
+                            include_dirs=[np.get_include()],
+                            extra_compile_args=['-std=c++11'])
     setup(
         name="murt",
         version="0.0.1",
