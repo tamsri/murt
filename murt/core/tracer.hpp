@@ -1,6 +1,11 @@
 #ifndef TRACER_H
 #define TRACER_H
 
+#include <vector>
+
+#include "triangle.hpp"
+#include "bvh.hpp"
+
 class Tracer
 {
 public:
@@ -10,10 +15,9 @@ public:
     std::vector<Triangle *> triangles_;
 
     // TODO[]: Initialie Tracer
-    Tracer(std::vector<Triangle *> &triangles) : id_(global_id++)
+    Tracer(std::vector<Triangle *> &triangles) : id_(global_id++), triangles_(triangles)
     {
-        triangles_ = triangles;
-        scene_ = new BVH(triangles);
+        scene_ = new BVH(triangles_);
     };
 
     ~Tracer()
@@ -24,6 +28,13 @@ public:
         triangles_.clear();
     };
 
+    bool IsLOS(Vec3 txPos, Vec3 rxPos, float &distance)
+    {
+        Vec3 ray_dir = (rxPos - txPos);
+        ray_dir.Normalize();
+        Ray ray(txPos, ray_dir);
+        return scene_->IsIntersect(ray, distance);
+    }
     // TODO[]: Trace
     void Trace(Vec3 txPos, Vec3 rxPos){
 

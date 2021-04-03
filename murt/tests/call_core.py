@@ -6,7 +6,7 @@ import numpy as np
 def main():
     print("Loading the obj file...")
     vertices, triangles = objreader.read('./assets/poznan.obj')
-    pritnt("Creating ray tracer....")
+    print("Creating ray tracer....")
     tracer = core.Tracer(vertices, triangles)
     print(f'#id : {tracer.getid()}')
 
