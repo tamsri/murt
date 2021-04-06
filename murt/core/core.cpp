@@ -143,7 +143,7 @@ static PyTypeObject RayTracerType = {
     .tp_clear = (inquiry)RayTracerObjectClear,
     .tp_methods = RayTracerMethods,
     .tp_members = RayTracerMembers,
-    .tp_init = (initproc)RayTracerObjectInit,
+    .tp_init = 0, //(initproc)RayTracerObjectInit,
     .tp_new = RayTracerObjectNew,
 };
 

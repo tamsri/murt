@@ -4,4 +4,4 @@ clean:
 get:
 	python setup.py install
 test:
-	python ./murt/tests/call_core.py 
+	python ./murt/tests/core_tests.py 
