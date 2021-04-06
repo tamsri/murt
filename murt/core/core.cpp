@@ -28,9 +28,16 @@ static PyObject *Trace(RayTracerObject *self, PyObject *args)
 
     // TODO[]: put to tracer
     Vec3 txPos, rxPos;
+    txPos.x_ = (float)*(double *)PyArray_GETPTR2(txArrObj, 0, 0);
+    txPos.y_ = (float)*(double *)PyArray_GETPTR2(txArrObj, 1, 0);
+    txPos.z_ = (float)*(double *)PyArray_GETPTR2(txArrObj, 2, 0);
+
+    rxPos.x_ = (float)*(double *)PyArray_GETPTR2(txArrObj, 0, 0);
+    rxPos.y_ = (float)*(double *)PyArray_GETPTR2(txArrObj, 1, 0);
+    rxPos.z_ = (float)*(double *)PyArray_GETPTR2(txArrObj, 2, 0);
 
     // TODO[]: trace
-    //(self->tracer)->Trace(txPos, rxPos);
+    (self->tracer)->Trace(txPos, rxPos);
     // TODO[]: construct object and return
 
     return Py_BuildValue("s", "yes");
@@ -98,10 +105,10 @@ static PyObject *RayTracerObjectNew(PyTypeObject *type, PyObject *args, PyObject
 
 static int RayTracerObjectClear(RayTracerObject *self)
 {
-    if (self->tracer)
+    if (self->tracer != nullptr)
     {
         delete self->tracer;
-        self->tracer = NULL;
+        self->tracer = nullptr;
     }
     return 0;
 }
@@ -113,8 +120,6 @@ static void RayTracerObjectDealloc(RayTracerObject *self)
 
 static int RayTracerObjectInit(RayTracerObject *self, PyObject *args, PyObject *kwds)
 {
-    // TODO: Read args to scene_
-
     return 0;
 }
 /*----------------------------------------------------------------*/

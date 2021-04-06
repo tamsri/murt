@@ -35,6 +35,7 @@ public:
         Ray ray(txPos, ray_dir);
         return scene_->IsIntersect(ray, distance);
     }
+
     // TODO[]: Trace
     void Trace(Vec3 txPos, Vec3 rxPos){
 

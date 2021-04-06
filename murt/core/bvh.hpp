@@ -24,7 +24,7 @@ public:
     Box *right_;
     float min_x = FLT_MAX, min_y = FLT_MAX, min_z = FLT_MAX;
     float max_x = -FLT_MAX, max_y = -FLT_MAX, max_z = -FLT_MAX;
-    Box(std::vector<Triangle *> &new_members) : alone_(false)
+    Box(std::vector<Triangle *> &new_members) : alone_(false), left_(nullptr), right_(nullptr)
     {
         // require to input members
         members_ = new_members;
@@ -46,6 +46,20 @@ public:
         //printf("min_bound: %.2f %.2f %.2f\n", min_x, min_y, min_z);
         max_bound_ = Vec3(max_x, max_y, max_z);
         //printf("max_bound: %.2f %.2f %.2f\n", max_x, max_y, max_z);
+    }
+    ~Box()
+    {
+        members_.clear();
+        if (left_ != nullptr)
+        {
+            delete left_;
+            left_ = nullptr;
+        }
+        if (right_ != nullptr)
+        {
+            delete right_;
+            left_ = nullptr;
+        }
     }
     // TODO[]: Box-Ray intersection
     bool IsIntersect(const Ray &ray)
@@ -89,6 +103,8 @@ public:
     }
     ~BVH()
     {
+        delete root_;
+        root_ = nullptr;
     }
 
     // TODO[]: Tree intersection, scanning from children
@@ -132,7 +148,7 @@ public:
     // TODO[X]: Make Children
     static void MakeChildren(Box *parent, int level)
     {
-        printf("depth: %d, parents members: %d \n", level, parent->members_.size());
+        //printf("depth: %d, parents members: %d \n", level, parent->members_.size());
         // Dimension of Sectorisation
         // k = 0 -> sectorise by x-axis
         // k = 1 -> sectorise by y-axis
