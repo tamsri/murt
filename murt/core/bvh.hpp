@@ -48,15 +48,33 @@ public:
         //printf("max_bound: %.2f %.2f %.2f\n", max_x, max_y, max_z);
     }
     // TODO[]: Box-Ray intersection
-    bool IsIntersect(const Ray &ray, float &distance)
-    {
-        return false;
-    };
     bool IsIntersect(const Ray &ray)
     {
+        // Check if the ray is inside the box.
+        // TODO[]: Check if this on top runs faster.
+        /*if (ray.origin_.x_ > min_bound_.x_ && ray.origin_.x_ < max_bound_.x &&
+            ray.origin_.y_ > min_bound_.y_ && ray.origin_.y_ < max_bound_.y_ &&
+            ray.origin_.z_ > min_bound_.y_ && ray.origin_.z_ < max_bound_.z_)
+            return true;*/
 
-        return false;
-    }
+        // Fast branchless raybounding box intersection.
+        float t1 = (min_bound_.x_ - ray.origin_.x_) * ray.in_dir_.x_;
+        float t2 = (max_bound_.x_ - ray.origin_.x_) * ray.in_dir_.x_;
+        float tmin = std::min(t1, t2);
+        float tmax = std::max(t1, t2);
+
+        float t3 = (min_bound_.y_ - ray.origin_.y_) * ray.in_dir_.y_;
+        float t4 = (max_bound_.y_ - ray.origin_.y_) * ray.in_dir_.y_;
+        tmin = std::max(tmin, std::min(t3, t4));
+        tmax = std::min(tmax, std::max(t3, t4));
+
+        float t5 = (min_bound_.z_ - ray.origin_.z_) * ray.in_dir_.z_;
+        float t6 = (max_bound_.z_ - ray.origin_.z_) * ray.in_dir_.z_;
+        tmin = std::max(tmin, std::min(t5, t6));
+        tmax = std::min(tmax, std::max(t5, t6));
+
+        return tmax >= tmin;
+    };
 };
 
 class BVH
