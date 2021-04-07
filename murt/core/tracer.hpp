@@ -27,7 +27,7 @@ public:
     BVH *scene_;
     std::vector<Triangle *> triangles_;
 
-    // TODO[]: Initialie Tracer
+    // TODO[]: Initialize Tracer
     Tracer(std::vector<Triangle *> &triangles) : id_(global_id++), triangles_(triangles)
     {
         scene_ = new BVH(triangles_);
@@ -52,6 +52,25 @@ public:
     }
 
     // TODO[]: get edges
+    bool FindEdge(Vec3 leftPos, Vec3 rightPos, Vec3 &edgePos)
+    {
+        constexpr float scan_step = 1.0f;
+
+        const float min_x = std::min(leftPos.x_, rightPos.x_);
+        const float max_x = std::max(leftPos.x_, rightPos.x_);
+        const float min_y = std::min(leftPos.y_, rightPos.y_);
+        const float max_y = std::max(leftPos.y_, rightPos.y_);
+        const float min_z = std::min(leftPos.z_, rightPos.z_);
+        const float max_z = std::max(leftPos.z_, rightPos.z_);
+
+        Ray ray(leftPos, leftPos - rightPos);
+        for (float angle = 0.0f; angle < 180.0f; angle += scan_step)
+        {
+        }
+
+        return false;
+    }
+
     Record GetEdges(Vec3 txPos, Vec3 rxPos)
     {
         Record record;
@@ -74,7 +93,7 @@ public:
     {
 
         Vec3 normal = triangle->normal_;
-        float b = Vec3::Dot(normal, triangle->p1);
+        float b = Vec3::Dot(normal, triangle->p1_);
         float t = (b - Vec3::Dot(pos, normal)) / (Vec3::Dot(normal, normal));
 
         Vec3 mirror_pos = pos + (normal * 2 * t);
@@ -99,17 +118,24 @@ public:
         }
 
         // Reflection
-        for (auto triangle : triangles_)
+        for (Triangle *triangle : triangles_)
         {
-            Vec3 mirror_point = GetMirrorPoint(pos, triangle);
-            Vec3 direction_to_rx = (rxPos - mirror_point).Normalize();
+            Vec3 mirror_point = GetMirrorPoint(txPos, triangle);
+            Vec3 direction_to_rx = (rxPos - mirror_point);
+            direction_to_rx.Normalize();
+
             Ray ref_ray(mirror_point, direction_to_rx);
             float distance;
-            if (!(triangle->IsIntersected(ref_ray, distance)))
+            if (!(triangle->IsIntersect(ref_ray, distance)))
                 continue;
             Vec3 point_on_triangle = mirror_point + direction_to_rx * (distance * 0.001f);
             if (IsLOS(txPos, point_on_triangle) && IsLOS(rxPos, point_on_triangle))
-                records.push_back(Record(RecordType::SingleReflected, {point_on_triangle}));
+            {
+                Record reflect_record;
+                reflect_record.type = RecordType::SingleReflected;
+                reflect_record.points.push_back(point_on_triangle);
+                records.push_back(reflect_record);
+            }
         }
 
         return records;

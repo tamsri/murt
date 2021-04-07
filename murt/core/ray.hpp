@@ -15,5 +15,11 @@ public:
         direction_.Normalize(); // ensure unit vector.
         in_dir_ = Vec3(1.0f / direction_.x_, 1.0f / direction_.y_, 1.0f / direction_.z_);
     };
+    // TODO[] Implement
+    void Pitch(float radian)
+    {
+
+        return;
+    }
 };
 #endif // RAY_Hś

@@ -1,12 +1,12 @@
 clean:
 	rm -r build
 	python setup.py clean
-get:
+all:
 	python setup.py install
 test:
 	python ./murt/tests/core_tests.py
 tai:
-	make get
+	make all
 	make test
 dev:
 	make clean

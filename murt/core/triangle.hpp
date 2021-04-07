@@ -14,7 +14,8 @@ public:
 
         Vec3 a = p2_ - p1_;
         Vec3 b = p3_ - p1_;
-        normal_ = Vec3::Cross(a, b).Normalize();
+        normal_ = Vec3::Cross(a, b);
+        normal_.Normalize();
     };
 
     bool IsIntersect(Ray ray, float &distance)
