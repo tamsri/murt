@@ -8,8 +8,14 @@ class Triangle
 {
 public:
     Vec3 p1_, p2_, p3_;
+    Vec3 normal_;
+    Triangle(Vec3 p1, Vec3 p2, Vec3 p3) : p1_(p1), p2_(p2), p3_(p3)
+    {
 
-    Triangle(Vec3 p1, Vec3 p2, Vec3 p3) : p1_(p1), p2_(p2), p3_(p3){};
+        Vec3 a = p2_ - p1_;
+        Vec3 b = p3_ - p1_;
+        normal_ = Vec3::Cross(a, b).Normalize();
+    };
 
     bool IsIntersect(Ray ray, float &distance)
     {
@@ -47,8 +53,6 @@ public:
 
         return false;
     }
-
-    
 };
 
 #endif // TRIANGLE_H
