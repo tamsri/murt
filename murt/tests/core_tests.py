@@ -1,6 +1,7 @@
 from murt import core
 from murt.utils import objreader
 import tracemalloc
+import numpy as np
 
 
 def CallCore():
@@ -26,14 +27,14 @@ def CheckMemoryLeak():
         if leak > 0:
             print(f"#{tracer_id}, Leaked: {leak} bytes")
     tracemalloc.stop()
-    #assert (leak < 1), "Memory should not be leaked"
+    # assert (leak < 1), "Memory should not be leaked"
 
 
 def main():
     print("------------ Call Core Test -------------")
     CallCore()
 
-    #print("----------- Memory Leak Test ------------")
+    # print("----------- Memory Leak Test ------------")
     # CheckMemoryLeak()
 
 

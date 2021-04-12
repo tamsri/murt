@@ -12,6 +12,7 @@ current_height = 480
 current_pos = [-20, -55, -135]
 current_rot = [20, 0, 0]
 window = Window(width=current_width, height=current_height, resizable=True)
+glClearColor(0.5, 0.5, 0.8, 1)
 
 
 def drawLine(start, end, color):
@@ -20,7 +21,7 @@ def drawLine(start, end, color):
     glVertex3f(*end)
     glColor4f(*color)
     glEnd()
-    glLineWidth(10)
+    glLineWidth(5)
 
 
 @window.event
@@ -30,8 +31,10 @@ def on_resize(width, height):
     current_height = height
     glViewport(0, 0, width, height)
 
+
 def key_update():
-    
+    pass
+
 
 @window.event
 def on_draw():
@@ -49,7 +52,7 @@ def on_draw():
     drawLine((-10, 20, 100), (100, 50, -10), (1, 0, 0, 0, 1))
 
 
-@ window.event
+@window.event
 def on_key_press(symbol, modifiers):
     global current_pos, current_rot
     if symbol == key.W:
