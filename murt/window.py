@@ -70,7 +70,7 @@ class MurtWindow(Window):
         for point in points:
             glVertex3f(*point)
         glEnd()
-        glLineWidth(5)
+        glLineWidth(2)
 
     def on_draw(self):
         self.render()

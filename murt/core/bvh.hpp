@@ -29,7 +29,10 @@ public:
         // require to input members
         members_ = new_members;
         if (members_.size() == 1)
+        {
             alone_ = true;
+            printf("aloneeeeee\n");
+        }
         // process min/max boundary
         float min_x = FLT_MAX, min_y = FLT_MAX, min_z = FLT_MAX;
         float max_x = FLT_MIN, max_y = FLT_MIN, max_z = FLT_MIN;
@@ -132,16 +135,15 @@ public:
                     closest_distance = std::min(current_distance, closest_distance);
                     is_hit_once = true;
                 }
+                continue;
             }
             // Put current_box's children to the queue
-            else
-            {
-                if (current_box->left_)
-                    hot_boxes.push(current_box->left_);
-                if (current_box->right_)
-                    hot_boxes.push(current_box->left_);
-            }
+            if (current_box->left_)
+                hot_boxes.push(current_box->left_);
+            if (current_box->right_)
+                hot_boxes.push(current_box->right_);
         }
+        printf("Is hit %d , %.2f\n", is_hit_once, closest_distance);
         return is_hit_once;
     }
 

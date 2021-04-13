@@ -37,7 +37,7 @@ class MurTracer():
                 pass
             if result[0] == 3:
                 line = {'points': [tuple(txPos), tuple(result[1]), tuple(rxPos)],
-                        'color': (0.1, 0.2, 0.3, 1)}
+                        'color': (0.7, 0.4, 0.7, 1)}
             if result[0] == 4:
                 dot = np.array(result[1]) + np.array([0, 0.2, 0])
                 line = {'points': [tuple(result[1]), tuple(dot)],

@@ -58,13 +58,11 @@ static PyObject *RecordsToPyRecords(std::vector<Record> records)
 
 static PyObject *Trace(RayTracerObject *self, PyObject *args)
 {
-    // TODO[]: Get args from numpy
     PyArrayObject *txArrObj;
     PyArrayObject *rxArrObj;
     if (!PyArg_ParseTuple(args, "O|O", &txArrObj, &rxArrObj))
         return NULL;
 
-    // TODO[]: put to tracer
     Vec3 txPos, rxPos;
     txPos.x_ = *(float *)PyArray_GETPTR1(txArrObj, 0);
     txPos.y_ = *(float *)PyArray_GETPTR1(txArrObj, 1);
@@ -74,12 +72,11 @@ static PyObject *Trace(RayTracerObject *self, PyObject *args)
     rxPos.y_ = *(float *)PyArray_GETPTR1(rxArrObj, 1);
     rxPos.z_ = *(float *)PyArray_GETPTR1(rxArrObj, 2);
 
-    printf("tx: %.2f, %.2f, %.2f \n", txPos.x_, txPos.y_, txPos.z_);
-    printf("rx: %.2f, %.2f, %.2f \n", rxPos.x_, rxPos.y_, rxPos.z_);
+    // printf("tx: %.2f, %.2f, %.2f \n", txPos.x_, txPos.y_, txPos.z_);
+    // printf("rx: %.2f, %.2f, %.2f \n", rxPos.x_, rxPos.y_, rxPos.z_);
     // TODO[]: trace
     std::vector<Record> records = (self->tracer)->Trace(txPos, rxPos);
 
-    // TODO[]: construct object and return
     PyObject *py_records = RecordsToPyRecords(records);
 
     return py_records;

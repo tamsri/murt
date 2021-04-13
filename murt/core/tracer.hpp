@@ -73,7 +73,7 @@ public:
         //     return true;
 
         bool res = !(distance < Vec3::Distance(txPos, rxPos));
-        printf("hit: %.2f, distance: %.2f, res: %d\n", distance, Vec3::Distance(txPos, rxPos), res);
+        //printf("hit: %.2f, distance: %.2f, res: %d\n", distance, Vec3::Distance(txPos, rxPos), res);
         return res;
     }
 
