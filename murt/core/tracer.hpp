@@ -10,7 +10,8 @@ enum RecordType
 {
     Direct = 0,
     Diffracted = 1,
-    SingleReflected = 2
+    SingleReflected = 2,
+    MirrorRecord = 3
 };
 
 struct Record
@@ -41,14 +42,39 @@ public:
         triangles_.clear();
     };
 
+    // IsHit is a primitive way of hit search with brute force approach
+    // the optimised method is to use BVH (scene->IsIntersect).
+    bool IsHit(const Ray &ray, float &closest_distance)
+    {
+        bool hit_something = false;
+        for (Triangle *triangle : triangles_)
+        {
+            float distance = FLT_MAX;
+            if (triangle->IsIntersect(ray, distance))
+            {
+                closest_distance = std::min(distance, closest_distance);
+                hit_something = true;
+            }
+        }
+        return hit_something;
+    }
+
     bool IsLOS(Vec3 txPos, Vec3 rxPos)
     {
         Vec3 ray_dir = (rxPos - txPos);
         ray_dir.Normalize();
         Ray ray(txPos, ray_dir);
         float distance = FLT_MAX;
-        scene_->IsIntersect(ray, distance);
-        return !(distance <= Vec3::Distance(txPos, rxPos));
+
+        if (!scene_->IsIntersect(ray, distance))
+            return true;
+
+        // if (!IsHit(ray, distance))
+        //     return true;
+
+        bool res = !(distance < Vec3::Distance(txPos, rxPos));
+        printf("hit: %.2f, distance: %.2f, res: %d\n", distance, Vec3::Distance(txPos, rxPos), res);
+        return res;
     }
 
     // TODO[]: get edges
@@ -93,11 +119,10 @@ public:
     {
 
         Vec3 normal = triangle->normal_;
-        float b = Vec3::Dot(normal, triangle->p1_);
+        float b = Vec3::Dot(normal, triangle->p2_);
         float t = (b - Vec3::Dot(pos, normal)) / (Vec3::Dot(normal, normal));
 
-        Vec3 mirror_pos = pos + (normal * 2 * t);
-        return mirror_pos;
+        return pos + normal * 2 * t;
     }
 
     // TODO[]: Trace
@@ -121,14 +146,16 @@ public:
         for (Triangle *triangle : triangles_)
         {
             Vec3 mirror_point = GetMirrorPoint(txPos, triangle);
+
             Vec3 direction_to_rx = (rxPos - mirror_point);
             direction_to_rx.Normalize();
-
             Ray ref_ray(mirror_point, direction_to_rx);
             float distance;
             if (!(triangle->IsIntersect(ref_ray, distance)))
                 continue;
-            Vec3 point_on_triangle = mirror_point + direction_to_rx * (distance * 0.001f);
+
+            Vec3 point_on_triangle = mirror_point + direction_to_rx * (distance + 0.001f);
+
             if (IsLOS(txPos, point_on_triangle) && IsLOS(rxPos, point_on_triangle))
             {
                 Record reflect_record;

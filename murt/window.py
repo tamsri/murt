@@ -16,7 +16,7 @@ class MurtWindow(Window):
         self.pressed_keys = {}
         self.scene = None
         self.lines_set = []
-        glClearColor(0.7, 0.7, 0.7, 1)
+        glClearColor(0.5, 0.5, 0.5, 1)
         self.alive = True
 
     def load_scene(self, file_path):
@@ -28,25 +28,25 @@ class MurtWindow(Window):
 
     def key_updates(self):
         if key.W in self.pressed_keys:
-            self.cam_pos[2] += 5
+            self.cam_pos[2] += 1
         if key.S in self.pressed_keys:
-            self.cam_pos[2] -= 5
+            self.cam_pos[2] -= 1
         if key.A in self.pressed_keys:
-            self.cam_pos[0] += 5
+            self.cam_pos[0] += 1
         if key.D in self.pressed_keys:
-            self.cam_pos[0] -= 5
+            self.cam_pos[0] -= 1
         if key.LSHIFT in self.pressed_keys:
-            self.cam_pos[1] += 5
+            self.cam_pos[1] += 1
         if key.LCTRL in self.pressed_keys:
-            self.cam_pos[1] -= 5
+            self.cam_pos[1] -= 1
         if key.Z in self.pressed_keys:
-            self.cam_rot[0] += 5
+            self.cam_rot[0] += 1
         if key.X in self.pressed_keys:
-            self.cam_rot[0] -= 5
+            self.cam_rot[0] -= 1
         if key.Q in self.pressed_keys:
-            self.cam_rot[1] += 5
+            self.cam_rot[1] += 1
         if key.E in self.pressed_keys:
-            self.cam_rot[1] -= 5
+            self.cam_rot[1] -= 1
 
     def on_close(self):
         self.alive = False
@@ -66,9 +66,9 @@ class MurtWindow(Window):
         points = lines['points']
         color = lines['color']
         glBegin(GL_LINE_STRIP)
+        glColor4f(*color)
         for point in points:
             glVertex3f(*point)
-        glColor4f(*color)
         glEnd()
         glLineWidth(5)
 

@@ -18,6 +18,44 @@ typedef struct
         Tracer *tracer;
 } RayTracerObject;
 
+static PyObject *RecordsToPyRecords(std::vector<Record> records)
+{
+    PyObject *py_records = PyList_New(records.size());
+    for (size_t i = 0; i < records.size(); ++i)
+    {
+        Record &record = records[i];
+        PyObject *py_record;
+        if (record.type == RecordType::Direct)
+        {
+            py_record = Py_BuildValue("[i]", 1);
+        }
+        else if (record.type == RecordType::Diffracted)
+        {
+            py_record = Py_BuildValue("[i]", 2);
+        }
+        else if (record.type == RecordType::SingleReflected)
+        {
+            printf("reflected\n");
+
+            float ref_x = record.points[0].x_;
+            float ref_y = record.points[0].y_;
+            float ref_z = record.points[0].z_;
+
+            py_record = Py_BuildValue("i (f f f)", 3, ref_x, ref_y, ref_z);
+        }
+        else if (record.type == RecordType::MirrorRecord)
+        {
+            float ref_x = record.points[0].x_;
+            float ref_y = record.points[0].y_;
+            float ref_z = record.points[0].z_;
+
+            py_record = Py_BuildValue("i (f f f)", 4, ref_x, ref_y, ref_z);
+        }
+        PyList_SetItem(py_records, i, py_record);
+    }
+    return py_records;
+}
+
 static PyObject *Trace(RayTracerObject *self, PyObject *args)
 {
     // TODO[]: Get args from numpy
@@ -40,14 +78,11 @@ static PyObject *Trace(RayTracerObject *self, PyObject *args)
     printf("rx: %.2f, %.2f, %.2f \n", rxPos.x_, rxPos.y_, rxPos.z_);
     // TODO[]: trace
     std::vector<Record> records = (self->tracer)->Trace(txPos, rxPos);
-    
-    for (auto record : records)
-    {
-        printf('eeerrr\n');
-    }
-    // TODO[]: construct object and return
 
-    return Py_BuildValue("s", "yes");
+    // TODO[]: construct object and return
+    PyObject *py_records = RecordsToPyRecords(records);
+
+    return py_records;
 }
 
 static PyObject *GetID(RayTracerObject *self, PyObject *Py_UNUSED(ignored))

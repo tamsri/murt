@@ -11,7 +11,6 @@ public:
     Vec3 normal_;
     Triangle(Vec3 p1, Vec3 p2, Vec3 p3) : p1_(p1), p2_(p2), p3_(p3)
     {
-
         Vec3 a = p2_ - p1_;
         Vec3 b = p3_ - p1_;
         normal_ = Vec3::Cross(a, b);
@@ -43,7 +42,7 @@ public:
             return false;
 
         q = Vec3::Cross(s, edge1);
-        v = f * Vec3::Dot(s, q);
+        v = f * Vec3::Dot(ray.direction_, q);
 
         if (v < 0.0f || u + v > 1.0f)
             return false;

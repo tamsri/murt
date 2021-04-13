@@ -125,7 +125,7 @@ public:
     // 3. Calculate Dot Product
     static float Dot(Vec3 v3_1, Vec3 v3_2)
     {
-        return v3_1.x_ * v3_2.x_ + v3_1.y_ * v3_2.y_ + v3_1.z_ * v3_2.z_;
+        return (v3_1.x_ * v3_2.x_) + (v3_1.y_ * v3_2.y_) + (v3_1.z_ * v3_2.z_);
     };
 
     // 3. Return Absolute Value

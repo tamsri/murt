@@ -32,7 +32,7 @@ public:
             alone_ = true;
         // process min/max boundary
         float min_x = FLT_MAX, min_y = FLT_MAX, min_z = FLT_MAX;
-        float max_x = FLT_MIN, max_y = FLT_MIN, max_z = -FLT_MIN;
+        float max_x = FLT_MIN, max_y = FLT_MIN, max_z = FLT_MIN;
         for (Triangle *triangle : members_)
         {
             min_x = std::min({triangle->p1_.x_, triangle->p2_.x_, triangle->p3_.x_, min_x});
@@ -126,10 +126,10 @@ public:
             // Final Box intersected
             if (current_box->alone_)
             {
-                float curernt_distance = 0.0f;
-                if (current_box->members_[0]->IsIntersect(ray, curernt_distance))
+                float current_distance = 0.0f;
+                if (current_box->members_[0]->IsIntersect(ray, current_distance))
                 {
-                    closest_distance = std::min(curernt_distance, closest_distance);
+                    closest_distance = std::min(current_distance, closest_distance);
                     is_hit_once = true;
                 }
             }
