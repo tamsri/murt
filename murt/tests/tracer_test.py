@@ -4,10 +4,10 @@ from murt.utils import objreader
 
 def TracerTest():
     print("------------ Tracer Test -------------")
-    a = MurTracer("./assets/poznan.obj", window=True)
+    a = MurTracer("./assets/single_edge.obj", window=True)
     #a.trace([1, 2, 1], [2, 3, 4])
-    txPos = [0, 10, 0]
-    rxPos = [2, 3, 0]
+    txPos = [0, 3, 0]
+    rxPos = [0, 3, -20]
     a.trace_draw(txPos, rxPos)
 
 

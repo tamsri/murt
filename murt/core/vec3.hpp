@@ -150,5 +150,11 @@ public:
         float cos_theta = Vec3::Dot(v3_1, v3_2) / (abs_1 + abs_2);
         return acos(cos_theta);
     };
+
+    // 6.5 check the given position is between xz plane
+    static bool BetweenXZ(float min_x, float max_x, float min_z, float max_z, Vec3 pos)
+    {
+        return (pos.x_ > min_x && pos.x_ < max_x) && (pos.z_ > min_z && pos.z_ < max_z);
+    }
 };
 #endif //VEC3_H

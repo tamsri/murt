@@ -28,13 +28,17 @@ class MurTracer():
         if self.window is None:
             return
         results = self.trace(txPos, rxPos)
+        print(results)
         for result in results:
             line = None
             if result[0] == 1:
                 line = {'points': [tuple(txPos), tuple(rxPos)],
                         'color': (0, 0.7, 0.3, 1)}
             if result[0] == 2:
-                pass
+                line = {'points': [tuple(txPos)], 'color': (0, 0, .9, 1)}
+                for point in result[1]:
+                    line['points'].append(tuple(point))
+                line['points'].append(tuple(rxPos))
             if result[0] == 3:
                 line = {'points': [tuple(txPos), tuple(result[1]), tuple(rxPos)],
                         'color': (0.7, 0.4, 0.7, 1)}

@@ -31,25 +31,23 @@ static PyObject *RecordsToPyRecords(std::vector<Record> records)
         }
         else if (record.type == RecordType::Diffracted)
         {
-            py_record = Py_BuildValue("[i]", 2);
+            size_t n = record.points.size();
+            PyObject *diff_points = PyList_New(n);
+            for (size_t j = 0; j < n; ++j)
+            {
+                Vec3 &dif_pos = record.points[j];
+                PyObject *py_diff_pos = Py_BuildValue("(f f f)", dif_pos.x_, dif_pos.y_, dif_pos.z_);
+                PyList_SetItem(diff_points, j, py_diff_pos);
+            }
+            py_record = Py_BuildValue("i O", 2, diff_points);
         }
         else if (record.type == RecordType::SingleReflected)
         {
-            printf("reflected\n");
-
             float ref_x = record.points[0].x_;
             float ref_y = record.points[0].y_;
             float ref_z = record.points[0].z_;
 
             py_record = Py_BuildValue("i (f f f)", 3, ref_x, ref_y, ref_z);
-        }
-        else if (record.type == RecordType::MirrorRecord)
-        {
-            float ref_x = record.points[0].x_;
-            float ref_y = record.points[0].y_;
-            float ref_z = record.points[0].z_;
-
-            py_record = Py_BuildValue("i (f f f)", 4, ref_x, ref_y, ref_z);
         }
         PyList_SetItem(py_records, i, py_record);
     }

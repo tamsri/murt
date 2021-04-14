@@ -15,11 +15,10 @@ public:
         direction_.Normalize(); // ensure unit vector.
         in_dir_ = Vec3(1.0f / direction_.x_, 1.0f / direction_.y_, 1.0f / direction_.z_);
     };
-    // TODO[] Implement
-    void Pitch(float radian)
-    {
 
-        return;
+    Vec3 PositionAt(float distance)
+    {
+        return origin_ + direction_ * distance;
     }
 };
 #endif // RAY_Hś

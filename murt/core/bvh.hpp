@@ -31,7 +31,6 @@ public:
         if (members_.size() == 1)
         {
             alone_ = true;
-            printf("aloneeeeee\n");
         }
         // process min/max boundary
         float min_x = FLT_MAX, min_y = FLT_MAX, min_z = FLT_MAX;
@@ -143,7 +142,6 @@ public:
             if (current_box->right_)
                 hot_boxes.push(current_box->right_);
         }
-        printf("Is hit %d , %.2f\n", is_hit_once, closest_distance);
         return is_hit_once;
     }
 

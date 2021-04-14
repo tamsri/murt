@@ -2,6 +2,7 @@
 #define TRACER_H
 
 #include <vector>
+#include <math.h>
 
 #include "triangle.hpp"
 #include "bvh.hpp"
@@ -69,49 +70,123 @@ public:
         if (!scene_->IsIntersect(ray, distance))
             return true;
 
-        // if (!IsHit(ray, distance))
-        //     return true;
-
         bool res = !(distance < Vec3::Distance(txPos, rxPos));
-        //printf("hit: %.2f, distance: %.2f, res: %d\n", distance, Vec3::Distance(txPos, rxPos), res);
         return res;
     }
 
     // TODO[]: get edges
     bool FindEdge(Vec3 leftPos, Vec3 rightPos, Vec3 &edgePos)
     {
-        constexpr float scan_step = 1.0f;
+        constexpr size_t max_scan = 10;
 
         const float min_x = std::min(leftPos.x_, rightPos.x_);
         const float max_x = std::max(leftPos.x_, rightPos.x_);
-        const float min_y = std::min(leftPos.y_, rightPos.y_);
-        const float max_y = std::max(leftPos.y_, rightPos.y_);
         const float min_z = std::min(leftPos.z_, rightPos.z_);
         const float max_z = std::max(leftPos.z_, rightPos.z_);
 
-        Ray ray(leftPos, leftPos - rightPos);
-        for (float angle = 0.0f; angle < 180.0f; angle += scan_step)
-        {
-        }
+        // ray from leftPos to rightPos
 
-        return false;
+        Vec3 top_direction(0.0f, 1.0f, 0.0f);
+        Ray upper_ray(leftPos, top_direction);
+        float unused_;
+        if (scene_->IsIntersect(upper_ray, unused_))
+            return false;
+        Ray lower_ray(leftPos, rightPos - leftPos);
+        size_t current_scan = 0;
+
+        // get nearest edge
+        while (current_scan++ < max_scan &&
+               Vec3::Angle(lower_ray.direction_, upper_ray.direction_) > 0.017f)
+        {
+            Vec3 new_direction = (upper_ray.direction_ + lower_ray.direction_) / 2;
+            new_direction.Normalize();
+            Ray check_ray(leftPos, new_direction);
+            float distance = FLT_MAX;
+            if (scene_->IsIntersect(check_ray, distance) &&
+                Vec3::BetweenXZ(min_x, max_x, min_z, max_z, check_ray.PositionAt(distance)))
+            {
+                lower_ray.direction_ = check_ray.direction_;
+            }
+            else
+            {
+                upper_ray.direction_ = check_ray.direction_;
+            }
+        }
+        printf("Upper: %.5f %.5f %.5f\n", upper_ray.direction_.x_, upper_ray.direction_.y_, upper_ray.direction_.z_);
+        printf("Lower: %.5f %.5f %.5f\n", lower_ray.direction_.x_, lower_ray.direction_.y_, lower_ray.direction_.z_);
+        // Actually, it's imposible to not intersect,
+        // but if it does, return false
+        float d = FLT_MAX;
+        if (!scene_->IsIntersect(lower_ray, d))
+            return false;
+
+        // get edge position
+        Vec3 leftPosOnPlane(leftPos.x_, 0.0f, leftPos.z_);
+        Vec3 rightPosOnPlane(rightPos.x_, 0.0f, rightPos.z_);
+        Vec3 plane_direction = rightPosOnPlane - leftPosOnPlane;
+        plane_direction.Normalize();
+        float theta = Vec3::Angle(plane_direction, lower_ray.direction_);
+
+        float x_angle = Vec3::Angle(lower_ray.direction_, upper_ray.direction_);
+        printf("x angle: %.5f\n", x_angle);
+        float height = d * cos(theta) * tan(theta + x_angle);
+        float width = cos(theta);
+        float edge_distance = sqrt(height * height + width * width);
+        printf("edge distance: %.2f", edge_distance);
+        edgePos = upper_ray.PositionAt(edge_distance);
+        printf("Edge pos: %.2f %.2f %.2f\n", edgePos.x_, edgePos.y_, edgePos.z_);
+
+        printf("Test-----------\n");
+        Vec3 a(0.0, 1.0f, 0.0f);
+        Vec3 b(0.0, 1.0f, 0.0f);
+        printf("angle: %.2f\n", Vec3::Angle(a, b));
+        printf("---------------\n");
+        return true;
     }
 
-    Record GetEdges(Vec3 txPos, Vec3 rxPos)
+    bool GetEdges(Vec3 txPos, Vec3 rxPos, Record &record)
     {
-        Record record;
         record.type = RecordType::Diffracted;
-        constexpr size_t max_scan = 10;
+        std::vector<Vec3> points;
+        constexpr size_t max_scan = 20;
         size_t current_scan = 0;
         Vec3 left_pos = txPos;
         Vec3 right_pos = rxPos;
 
-        while (!(IsLOS(left_pos, right_pos)) && current_scan < max_scan)
+        while (!(IsLOS(left_pos, right_pos)))
         {
-            current_scan++;
+            if (current_scan++ > max_scan)
+                return false;
+            printf("hello\n");
+            Vec3 edge_from_left;
+            if (!FindEdge(left_pos, right_pos, edge_from_left))
+                return false;
+            printf("edge from left: %.2f %.2f %.2f\n", edge_from_left.x_, edge_from_left.y_, edge_from_left.z_);
+            Vec3 edge_from_right;
+            if (!FindEdge(right_pos, left_pos, edge_from_right))
+                return false;
+            printf("edge from right: %.2f %.2f %.2f\n", edge_from_left.x_, edge_from_left.y_, edge_from_left.z_);
+
+            if (IsLOS(edge_from_left, edge_from_right))
+            {
+                if (Vec3::Distance(edge_from_left, edge_from_right) < 0.5f)
+                {
+                    Vec3 avg_edge = (edge_from_left + edge_from_right) / 2.0f;
+                    record.points.push_back(avg_edge);
+                    return true;
+                }
+                record.points.push_back(edge_from_left);
+                record.points.push_back(edge_from_right);
+                return true;
+            }
+
+            record.points.push_back(edge_from_left);
+            record.points.push_back(edge_from_right);
+            left_pos = edge_from_left;
+            right_pos = edge_from_right;
         }
 
-        return record;
+        return false;
     }
 
     // TODO[] :: add mirrored point
@@ -138,8 +213,11 @@ public:
         }
         else
         {
-            Record edgesRecord = GetEdges(txPos, rxPos);
-            records.push_back(edgesRecord);
+            Record record;
+            if (GetEdges(txPos, rxPos, record))
+            {
+                records.push_back(record);
+            }
         }
 
         // Reflection
