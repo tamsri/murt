@@ -50,4 +50,5 @@ class MurTracer():
             if line is not None:
                 self.window.lines_set.append(line)
 
-        self.window.run()
+    def clear_draw(self):
+        self.window.lines_set = []

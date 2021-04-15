@@ -29,7 +29,6 @@ public:
     BVH *scene_;
     std::vector<Triangle *> triangles_;
 
-    // TODO[]: Initialize Tracer
     Tracer(std::vector<Triangle *> &triangles) : id_(global_id++), triangles_(triangles)
     {
         scene_ = new BVH(triangles_);
@@ -77,7 +76,8 @@ public:
     // TODO[]: get edges
     bool FindEdge(Vec3 leftPos, Vec3 rightPos, Vec3 &edgePos)
     {
-        constexpr size_t max_scan = 10;
+        constexpr size_t max_scan = 20;
+        constexpr float min_angle = 0.017f;
 
         const float min_x = std::min(leftPos.x_, rightPos.x_);
         const float max_x = std::max(leftPos.x_, rightPos.x_);
@@ -96,7 +96,7 @@ public:
 
         // get nearest edge
         while (current_scan++ < max_scan &&
-               Vec3::Angle(lower_ray.direction_, upper_ray.direction_) > 0.017f)
+               Vec3::Angle(lower_ray.direction_, upper_ray.direction_) > min_angle)
         {
             Vec3 new_direction = (upper_ray.direction_ + lower_ray.direction_) / 2;
 
@@ -111,18 +111,14 @@ public:
             {
                 upper_ray = check_ray;
             }
-            printf("Upper: %.5f %.5f %.5f\n", upper_ray.direction_.x_, upper_ray.direction_.y_, upper_ray.direction_.z_);
-            printf("Lower: %.5f %.5f %.5f\n", lower_ray.direction_.x_, lower_ray.direction_.y_, lower_ray.direction_.z_);
         }
-        printf("scaned : %d\n", current_scan);
+
         // Actually, it's imposible to not intersect,
-        // but if it does, return false
+        // but if it does, return false. If speed is needed, comment out.
         float d = FLT_MAX;
         if (!scene_->IsIntersect(lower_ray, d))
-        {
-            printf("NOoooooo\n");
             return false;
-        }
+
         // get edge position
         Vec3 leftPosOnPlane(leftPos.x_, 0.0f, leftPos.z_);
         Vec3 rightPosOnPlane(rightPos.x_, 0.0f, rightPos.z_);
@@ -131,16 +127,11 @@ public:
         float theta = Vec3::Angle(plane_direction, lower_ray.direction_);
 
         float x_angle = Vec3::Angle(lower_ray.direction_, upper_ray.direction_);
-        printf("x angle: %.5f\n", x_angle);
         float height = d * cos(theta) * tan(theta + x_angle);
         float width = d * cos(theta);
         float edge_distance = sqrt(height * height + width * width);
-        printf("edge distance: %.2f\n", edge_distance);
 
-        printf("Upper dir: %.2f %.2f %.2f\n", upper_ray.direction_.x_, upper_ray.direction_.y_, upper_ray.direction_.z_);
-        printf("Upper pos: %.2f %.2f %.2f\n", upper_ray.origin_.x_, upper_ray.origin_.y_, upper_ray.origin_.z_);
         edgePos = upper_ray.PositionAt(edge_distance);
-        printf("Edge pos: %.2f %.2f %.2f\n", edgePos.x_, edgePos.y_, edgePos.z_);
 
         return true;
     }
@@ -161,16 +152,15 @@ public:
             Vec3 edge_from_left;
             if (!FindEdge(left_pos, right_pos, edge_from_left))
                 return false;
-            printf("edge from left: %.2f %.2f %.2f\n", edge_from_left.x_, edge_from_left.y_, edge_from_left.z_);
             Vec3 edge_from_right;
             if (!FindEdge(right_pos, left_pos, edge_from_right))
                 return false;
-            printf("edge from right: %.2f %.2f %.2f\n", edge_from_left.x_, edge_from_left.y_, edge_from_left.z_);
 
             if (IsLOS(edge_from_left, edge_from_right))
             {
                 if (Vec3::Distance(edge_from_left, edge_from_right) < 0.5f)
                 {
+                    // merge the edges since they are too near.
                     Vec3 avg_edge = (edge_from_left + edge_from_right) / 2.0f;
                     record.points.push_back(avg_edge);
                     return true;
@@ -185,7 +175,6 @@ public:
             left_pos = edge_from_left;
             right_pos = edge_from_right;
         }
-
         return false;
     }
 
@@ -203,28 +192,25 @@ public:
 
         std::vector<Vec3> new_edges;
         for (auto &[distance, edge] : ordered_edges)
-        {
             new_edges.push_back(edge);
-        }
         edges = new_edges;
+        ordered_edges.clear();
     }
 
-    // TODO[] :: add mirrored point
     Vec3 GetMirrorPoint(Vec3 pos, Triangle *triangle)
     {
-
+        // My invented mirror formula from high school's knowledge ;) - Supawat Tamsri 😎
         Vec3 normal = triangle->normal_;
-        float b = Vec3::Dot(normal, triangle->p2_);
-        float t = (b - Vec3::Dot(pos, normal)) / (Vec3::Dot(normal, normal));
+        float t = (Vec3::Dot(normal, triangle->p2_) - Vec3::Dot(pos, normal)) / (Vec3::Dot(normal, normal));
 
         return pos + normal * 2 * t;
     }
 
-    // TODO[]: Trace
     std::vector<Record> Trace(Vec3 txPos, Vec3 rxPos)
     {
         std::vector<Record> records;
-        // LOS/NLOS
+
+        // Trace -> LOS/NLOS
         if (IsLOS(txPos, rxPos))
         {
             Record los_record;
@@ -241,7 +227,7 @@ public:
             }
         }
 
-        // Reflection
+        // Trace -> Reflection
         for (Triangle *triangle : triangles_)
         {
             Vec3 mirror_point = GetMirrorPoint(txPos, triangle);
@@ -249,6 +235,7 @@ public:
             Vec3 direction_to_rx = (rxPos - mirror_point);
             direction_to_rx.Normalize();
             Ray ref_ray(mirror_point, direction_to_rx);
+
             float distance;
             if (!(triangle->IsIntersect(ref_ray, distance)))
                 continue;
@@ -266,6 +253,13 @@ public:
 
         return records;
     };
+    bool IsOutdoor(Vec3 pos)
+    {
+        Vec3 top_pos = pos;
+        top_pos.y_ = FLT_MAX;
+
+        return IsLOS(pos, top_pos);
+    }
 };
 
 unsigned int Tracer::global_id = 0;

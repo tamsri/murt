@@ -9,7 +9,7 @@ def CallCore():
     vertices, triangles = objreader.read('./assets/poznan.obj')
     print("Creating ray tracer....")
     tracer = core.Tracer(vertices, triangles)
-    print(f'#id : {tracer.getid()}')
+    print(f'#id : {tracer.getId()}')
 
 
 def CheckMemoryLeak():

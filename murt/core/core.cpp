@@ -70,14 +70,25 @@ static PyObject *Trace(RayTracerObject *self, PyObject *args)
     rxPos.y_ = *(float *)PyArray_GETPTR1(rxArrObj, 1);
     rxPos.z_ = *(float *)PyArray_GETPTR1(rxArrObj, 2);
 
-    // printf("tx: %.2f, %.2f, %.2f \n", txPos.x_, txPos.y_, txPos.z_);
-    // printf("rx: %.2f, %.2f, %.2f \n", rxPos.x_, rxPos.y_, rxPos.z_);
-    // TODO[]: trace
     std::vector<Record> records = (self->tracer)->Trace(txPos, rxPos);
 
     PyObject *py_records = RecordsToPyRecords(records);
 
     return py_records;
+}
+
+static PyObject *IsOutdoor(RayTracerObject *self, PyObject *args)
+{
+    PyArrayObject *arrObj;
+    if (!PyArg_ParseTuple(args, "O", &arrObj))
+        return NULL;
+
+    Vec3 position;
+    position.x_ = *(float *)PyArray_GETPTR1(arrObj, 0);
+    position.y_ = *(float *)PyArray_GETPTR1(arrObj, 1);
+    position.z_ = *(float *)PyArray_GETPTR1(arrObj, 2);
+
+    return Py_BuildValue("p", (self->tracer)->IsOutdoor(position));
 }
 
 static PyObject *GetID(RayTracerObject *self, PyObject *Py_UNUSED(ignored))
@@ -164,7 +175,8 @@ static int RayTracerObjectInit(RayTracerObject *self, PyObject *args, PyObject *
 /*Define methods*/
 static PyMethodDef RayTracerMethods[] = {
     {"trace", (PyCFunction)Trace, METH_VARARGS, "Trace rays from tx to rx"},
-    {"getid", (PyCFunction)GetID, METH_NOARGS, "Return ID of Tracer"},
+    {"isOutdoor", (PyCFunction)IsOutdoor, METH_VARARGS, "Check if the input position is indoor"},
+    {"getId", (PyCFunction)GetID, METH_NOARGS, "Return ID of Tracer"},
     {NULL}
     //{NULL, NULL, 0, NULL},
 };
