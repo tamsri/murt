@@ -145,16 +145,24 @@ public:
     // 5. Calcuclate Angle between vector direction
     static float Angle(Vec3 v3_1, Vec3 v3_2)
     {
-        float abs_1 = Vec3::Abs(v3_1);
-        float abs_2 = Vec3::Abs(v3_2);
-        float cos_theta = Vec3::Dot(v3_1, v3_2) / (abs_1 + abs_2);
-        return acos(cos_theta);
+        return acos(Vec3::Dot(v3_1, v3_2) / (Vec3::Abs(v3_1) * Vec3::Abs(v3_2)));
     };
 
     // 6.5 check the given position is between xz plane
     static bool BetweenXZ(float min_x, float max_x, float min_z, float max_z, Vec3 pos)
     {
-        return (pos.x_ > min_x && pos.x_ < max_x) && (pos.z_ > min_z && pos.z_ < max_z);
+        return (pos.x_ >= min_x) && (pos.x_ <= max_x) && (pos.z_ >= min_z) && (pos.z_ <= max_z);
+    }
+
+    // compare operator
+    bool operator<(const Vec3 &cvec) const
+    {
+        if (x_ != cvec.x_)
+            return x_ < cvec.x_;
+        else if (y_ != cvec.y_)
+            return y_ < cvec.y_;
+        else
+            return z_ < cvec.z_;
     }
 };
 #endif //VEC3_H

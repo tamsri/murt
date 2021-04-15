@@ -99,27 +99,30 @@ public:
                Vec3::Angle(lower_ray.direction_, upper_ray.direction_) > 0.017f)
         {
             Vec3 new_direction = (upper_ray.direction_ + lower_ray.direction_) / 2;
-            new_direction.Normalize();
+
             Ray check_ray(leftPos, new_direction);
             float distance = FLT_MAX;
             if (scene_->IsIntersect(check_ray, distance) &&
                 Vec3::BetweenXZ(min_x, max_x, min_z, max_z, check_ray.PositionAt(distance)))
             {
-                lower_ray.direction_ = check_ray.direction_;
+                lower_ray = check_ray;
             }
             else
             {
-                upper_ray.direction_ = check_ray.direction_;
+                upper_ray = check_ray;
             }
+            printf("Upper: %.5f %.5f %.5f\n", upper_ray.direction_.x_, upper_ray.direction_.y_, upper_ray.direction_.z_);
+            printf("Lower: %.5f %.5f %.5f\n", lower_ray.direction_.x_, lower_ray.direction_.y_, lower_ray.direction_.z_);
         }
-        printf("Upper: %.5f %.5f %.5f\n", upper_ray.direction_.x_, upper_ray.direction_.y_, upper_ray.direction_.z_);
-        printf("Lower: %.5f %.5f %.5f\n", lower_ray.direction_.x_, lower_ray.direction_.y_, lower_ray.direction_.z_);
+        printf("scaned : %d\n", current_scan);
         // Actually, it's imposible to not intersect,
         // but if it does, return false
         float d = FLT_MAX;
         if (!scene_->IsIntersect(lower_ray, d))
+        {
+            printf("NOoooooo\n");
             return false;
-
+        }
         // get edge position
         Vec3 leftPosOnPlane(leftPos.x_, 0.0f, leftPos.z_);
         Vec3 rightPosOnPlane(rightPos.x_, 0.0f, rightPos.z_);
@@ -130,17 +133,15 @@ public:
         float x_angle = Vec3::Angle(lower_ray.direction_, upper_ray.direction_);
         printf("x angle: %.5f\n", x_angle);
         float height = d * cos(theta) * tan(theta + x_angle);
-        float width = cos(theta);
+        float width = d * cos(theta);
         float edge_distance = sqrt(height * height + width * width);
-        printf("edge distance: %.2f", edge_distance);
+        printf("edge distance: %.2f\n", edge_distance);
+
+        printf("Upper dir: %.2f %.2f %.2f\n", upper_ray.direction_.x_, upper_ray.direction_.y_, upper_ray.direction_.z_);
+        printf("Upper pos: %.2f %.2f %.2f\n", upper_ray.origin_.x_, upper_ray.origin_.y_, upper_ray.origin_.z_);
         edgePos = upper_ray.PositionAt(edge_distance);
         printf("Edge pos: %.2f %.2f %.2f\n", edgePos.x_, edgePos.y_, edgePos.z_);
 
-        printf("Test-----------\n");
-        Vec3 a(0.0, 1.0f, 0.0f);
-        Vec3 b(0.0, 1.0f, 0.0f);
-        printf("angle: %.2f\n", Vec3::Angle(a, b));
-        printf("---------------\n");
         return true;
     }
 
@@ -157,7 +158,6 @@ public:
         {
             if (current_scan++ > max_scan)
                 return false;
-            printf("hello\n");
             Vec3 edge_from_left;
             if (!FindEdge(left_pos, right_pos, edge_from_left))
                 return false;
@@ -189,6 +189,26 @@ public:
         return false;
     }
 
+    static void ReorderEdges(Vec3 txPos, std::vector<Vec3> &edges)
+    {
+        txPos.y_ = 0.0f;
+        std::set<std::pair<float, Vec3> > ordered_edges;
+        for (Vec3 edge : edges)
+        {
+            Vec3 edge_on_plane = edge;
+            edge_on_plane.y_ = 0.0f;
+            float distance = Vec3::Distance(txPos, edge_on_plane);
+            ordered_edges.insert({distance, edge});
+        }
+
+        std::vector<Vec3> new_edges;
+        for (auto &[distance, edge] : ordered_edges)
+        {
+            new_edges.push_back(edge);
+        }
+        edges = new_edges;
+    }
+
     // TODO[] :: add mirrored point
     Vec3 GetMirrorPoint(Vec3 pos, Triangle *triangle)
     {
@@ -216,6 +236,7 @@ public:
             Record record;
             if (GetEdges(txPos, rxPos, record))
             {
+                Tracer::ReorderEdges(txPos, record.points);
                 records.push_back(record);
             }
         }
