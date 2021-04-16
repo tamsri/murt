@@ -18,6 +18,7 @@ class MurtWindow(Window):
         self.lines_set = []
         glClearColor(0.5, 0.5, 0.5, 1)
         self.alive = True
+        self.zoom = 60
 
     def load_scene(self, file_path):
         self.scene = Wavefront(file_path, collect_faces=True, strict=False)
@@ -25,6 +26,14 @@ class MurtWindow(Window):
     def on_resize(self, width, height):
         self.win_size = [width, height]
         glViewport(0, 0, width, height)
+
+    def on_mouse_drag(self, x, y, dx, dy, buttons, modifieres):
+        self.cam_rot[1] += dx
+        self.cam_rot[0] -= dy
+
+    def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
+        self.zoom = max(20, self.zoom+scroll_y)
+        self.zoom = min(120, self.zoom+scroll_y)
 
     def key_updates(self):
         if key.W in self.pressed_keys:
@@ -81,8 +90,8 @@ class MurtWindow(Window):
         # Projection
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
-        gluPerspective(60., self.win_size[0] /
-                       float(self.win_size[1]), .1, 1000.)
+        gluPerspective(self.zoom, self.win_size[0] /
+                       float(self.win_size[1]), .1, 1000)
         glMatrixMode(GL_MODELVIEW)
         glLoadIdentity()
         # Translate Camera

@@ -178,25 +178,6 @@ public:
         return false;
     }
 
-    static void ReorderEdges(Vec3 txPos, std::vector<Vec3> &edges)
-    {
-        txPos.y_ = 0.0f;
-        std::set<std::pair<float, Vec3> > ordered_edges;
-        for (Vec3 edge : edges)
-        {
-            Vec3 edge_on_plane = edge;
-            edge_on_plane.y_ = 0.0f;
-            float distance = Vec3::Distance(txPos, edge_on_plane);
-            ordered_edges.insert({distance, edge});
-        }
-
-        std::vector<Vec3> new_edges;
-        for (auto &[distance, edge] : ordered_edges)
-            new_edges.push_back(edge);
-        edges = new_edges;
-        ordered_edges.clear();
-    }
-
     Vec3 GetMirrorPoint(Vec3 pos, Triangle *triangle)
     {
         // My invented mirror formula from high school's knowledge ;) - Supawat Tamsri 😎
@@ -222,7 +203,7 @@ public:
             Record record;
             if (GetEdges(txPos, rxPos, record))
             {
-                Tracer::ReorderEdges(txPos, record.points);
+                Vec3::ReorderEdges(txPos, record.points);
                 records.push_back(record);
             }
         }

@@ -28,7 +28,7 @@ def main():
     core_module = Extension('murt.core',
                             sources=['murt/core/core.cpp'],
                             include_dirs=[np.get_include()],
-                            extra_compile_args=['-std=c++11'])
+                            extra_compile_args=['-std=c++17'])
     setup(
         name="murt",
         version="0.0.1",

@@ -24,7 +24,7 @@ static PyObject *RecordsToPyRecords(std::vector<Record> records)
     for (size_t i = 0; i < records.size(); ++i)
     {
         Record &record = records[i];
-        PyObject *py_record;
+        PyObject *py_record = nullptr;
         if (record.type == RecordType::Direct)
         {
             py_record = Py_BuildValue("[i]", 1);
@@ -160,6 +160,7 @@ static int RayTracerObjectClear(RayTracerObject *self)
     }
     return 0;
 }
+
 static void RayTracerObjectDealloc(RayTracerObject *self)
 {
     RayTracerObjectClear(self);

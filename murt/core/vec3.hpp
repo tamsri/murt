@@ -2,6 +2,8 @@
 #define VEC3_H
 
 #include <math.h>
+#include <set>
+#include <utility>
 
 class Vec3
 {
@@ -163,6 +165,25 @@ public:
             return y_ < cvec.y_;
         else
             return z_ < cvec.z_;
+    }
+
+    static void ReorderEdges(Vec3 txPos, std::vector<Vec3> &edges)
+    {
+        txPos.y_ = 0.0f;
+        std::set<std::pair<float, Vec3> > ordered_edges;
+        for (Vec3 edge : edges)
+        {
+            Vec3 edge_on_plane = edge;
+            edge_on_plane.y_ = 0.0f;
+            float distance = Vec3::Distance(txPos, edge_on_plane);
+            ordered_edges.insert({distance, edge});
+        }
+
+        std::vector<Vec3> new_edges;
+        for (auto &[distance, edge] : ordered_edges)
+            new_edges.push_back(edge);
+        edges = new_edges;
+        ordered_edges.clear();
     }
 };
 #endif //VEC3_H
