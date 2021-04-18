@@ -4,6 +4,7 @@
 #include <math.h>
 #include <set>
 #include <utility>
+#include <string>
 
 class Vec3
 {
@@ -184,6 +185,10 @@ public:
             new_edges.push_back(edge);
         edges = new_edges;
         ordered_edges.clear();
+    }
+    std::string GetString() const
+    {
+        return "(" + std::to_string(x_) + ", " + std::to_string(y_) + ", " + std::to_string(z_) + ")";
     }
 };
 #endif //VEC3_H

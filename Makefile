@@ -4,8 +4,9 @@ clean:
 all:
 	python setup.py install
 test:
-	python ./murt/tests/core_tests.py
-	python ./murt/tests/tracer_test.py
+	#python ./murt/tests/core_tests.py
+	#python ./murt/tests/tracer_test.py
+	python ./murt/tests/calculator_tests.py
 tai:
 	make all
 	make test

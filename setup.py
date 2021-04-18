@@ -29,13 +29,17 @@ def main():
                             sources=['murt/core/core.cpp'],
                             include_dirs=[np.get_include()],
                             extra_compile_args=['-std=c++17'])
+
+    calculator_module = Extension('murt.calculator',
+                                  sources=['murt/core/calculator.cpp'],
+                                  extra_compile_args=['-std=c++17'])
     setup(
         name="murt",
         version="0.0.1",
         author="Supawat Tamsri",
         author_email="contact@supawat.dev",
         packages=["murt", "murt.utils"],
-        ext_modules=[core_module],
+        ext_modules=[core_module, calculator_module],
     )
 
 

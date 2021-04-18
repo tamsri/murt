@@ -2,67 +2,25 @@
 
 #include <Python.h>
 
-#include <math.h>
-#include <vector>
-
-#include "vec3.hpp"
-
-#define LIGHT_SPEED 299792458.0f
-
-static float GetDelay(std::vector<Vec3> points, float speed)
-{
-    float total_distance = 0.0f;
-    for (size_t i = 0; i < points.size() - 1; ++i)
-    {
-        total_distance += Vec3::Distance(points[i], points[i + 1]);
-    }
-    return total_distance / speed;
-}
-
-static float DirectPathLoss(Vec3 txPos, Vec3 rxPos, float txFreq)
-{
-    return 20.0f * log10(Vec3::Distance(txPos, rxPos)) + 20.0f * log10(txFreq) - 147.5f;
-}
-
-static float GetRefCoe(Vec3 txPos, Vec3 rxPos, Vec3 refPos, float matPerm, bool isTM)
-{
-    Vec3 refToTx = txPos - refPos;
-    refToTx.Normalize();
-    Vec3 refToRx = rxPos - refPos;
-    refToRx.Normalize();
-
-    float angle = Vec3::Angle(refToTx, refToRx) / 2.0f;
-
-    if (isTM)
-    {
-    }
-    else
-    {
-    }
-
-    return coe;
-}
-
-static float ReflectedPathLoss(Vec3 txPos, Vec3 rxPos, Vec3 refPos, float txFreq, float matPerm)
-{
-    float ref_coe;
-    float distance = Vec3::Distance(txPos, refPos) + Vec3::Distance(refPos, rxPos);
-    return 20.0f * log10(distance) + 20.0f * log10(txFreq) - 20.0f * log10(abs(ref_coe)) - 147.55f;
-}
-
-static float DiffractedPathLoss(Vec3 txPos, Vec3 rxPos, std::vector<Vec3> edges, float frequency)
-{
-    float pl = 0;
-    return pl;
-}
+#include "calculator.hpp"
 
 static PyObject *GetDirectLoss(PyObject *self, PyObject *args)
 {
-    PyObject *txPos;
-    PyObject *rxPos;
+    PyObject *txPosObj;
+    PyObject *rxPosObj;
     float txFreq;
-    if (!PyArgs_ParseTuple(args, "O O f", &txPos, &rxPos, &txFreq))
+    if (!PyArg_ParseTuple(args, "O|O|f", &txPosObj, &rxPosObj, &txFreq))
         return NULL;
+
+    Vec3 txPos;
+    txPos.x_ = (float)PyFloat_AsDouble(PyList_GetItem(txPosObj, 0));
+    txPos.y_ = (float)PyFloat_AsDouble(PyList_GetItem(txPosObj, 1));
+    txPos.z_ = (float)PyFloat_AsDouble(PyList_GetItem(txPosObj, 2));
+
+    Vec3 rxPos;
+    rxPos.x_ = (float)PyFloat_AsDouble(PyList_GetItem(rxPosObj, 0));
+    rxPos.y_ = (float)PyFloat_AsDouble(PyList_GetItem(rxPosObj, 1));
+    rxPos.z_ = (float)PyFloat_AsDouble(PyList_GetItem(rxPosObj, 2));
 
     std::vector<Vec3> points;
     points.push_back(txPos);
@@ -78,22 +36,27 @@ static PyObject *GetDiffractionLoss(PyObject *self, PyObject *args)
     PyObject *rxPosObj;
     PyObject *edgesObj;
     float txFreq;
-    if (!PyArgs_ParseTuple(args, "O O O f", &txPosObj, &rxPosObj, &edgesObj, &txFreq))
+    if (!PyArg_ParseTuple(args, "O|O|O|f", &txPosObj, &rxPosObj, &edgesObj, &txFreq))
         return NULL;
 
     Vec3 txPos;
-    if (!PyArgs_ParseTuple(txPosObj, "f f f", &txPos.x_, &txPos.y_, &txPos.z_))
-        return NULL;
+    txPos.x_ = (float)PyFloat_AsDouble(PyList_GetItem(txPosObj, 0));
+    txPos.y_ = (float)PyFloat_AsDouble(PyList_GetItem(txPosObj, 1));
+    txPos.z_ = (float)PyFloat_AsDouble(PyList_GetItem(txPosObj, 2));
+
     Vec3 rxPos;
-    if (!PyArgs_ParseTuple(rxPosObj, "f f f", &rxPos.x_, &rxPos.y_, &rxPos.z_))
-        return NULL;
+    rxPos.x_ = (float)PyFloat_AsDouble(PyList_GetItem(rxPosObj, 0));
+    rxPos.y_ = (float)PyFloat_AsDouble(PyList_GetItem(rxPosObj, 1));
+    rxPos.z_ = (float)PyFloat_AsDouble(PyList_GetItem(rxPosObj, 2));
+
     std::vector<Vec3> edges;
     for (int i = 0; i < PyList_Size(edgesObj); ++i)
     {
         PyObject *edgeValue = PyList_GetItem(edgesObj, i);
         Vec3 edge;
-        if (!PyArgs_ParseTuple(edgeValue, "f f f", &edge.x_, &edge.y_, &edge.z_))
-            return NULL;
+        edge.x_ = (float)PyFloat_AsDouble(PyList_GetItem(edgeValue, 0));
+        edge.y_ = (float)PyFloat_AsDouble(PyList_GetItem(edgeValue, 1));
+        edge.z_ = (float)PyFloat_AsDouble(PyList_GetItem(edgeValue, 2));
         edges.push_back(edge);
     }
 
@@ -114,18 +77,23 @@ static PyObject *GetReflectionLoss(PyObject *self, PyObject *args)
     PyObject *refPosObj;
     float txFreq;
     float matPerm;
-    if (!PyArgs_ParseTuple(args, "O O O f f", &txPosObj, &rxPosObj, &refPosObj, &txFreq, &matPerm))
+    if (!PyArg_ParseTuple(args, "O|O|O|f|f", &txPosObj, &rxPosObj, &refPosObj, &txFreq, &matPerm))
         return NULL;
 
     Vec3 txPos;
-    if (!PyArgs_ParseTuple(txPosObj, "f f f", &txPos.x_, &txPos.y_, &txPos.z_))
-        return NULL;
+    txPos.x_ = (float)PyFloat_AsDouble(PyList_GetItem(txPosObj, 0));
+    txPos.y_ = (float)PyFloat_AsDouble(PyList_GetItem(txPosObj, 1));
+    txPos.z_ = (float)PyFloat_AsDouble(PyList_GetItem(txPosObj, 2));
+
     Vec3 rxPos;
-    if (!PyArgs_ParseTuple(rxPosObj, "f f f", &rxPos.x_, &rxPos.y_, &rxPos.z_))
-        return NULL;
+    rxPos.x_ = (float)PyFloat_AsDouble(PyList_GetItem(rxPosObj, 0));
+    rxPos.y_ = (float)PyFloat_AsDouble(PyList_GetItem(rxPosObj, 1));
+    rxPos.z_ = (float)PyFloat_AsDouble(PyList_GetItem(rxPosObj, 2));
+
     Vec3 refPos;
-    if (!PyArgs_ParseTuple(refPosObj, "f f f", &refPos.x_, &refPos.y_, &refPos.z_))
-        return NULL;
+    refPos.x_ = (float)PyFloat_AsDouble(PyList_GetItem(refPosObj, 0));
+    refPos.y_ = (float)PyFloat_AsDouble(PyList_GetItem(refPosObj, 1));
+    refPos.z_ = (float)PyFloat_AsDouble(PyList_GetItem(refPosObj, 2));
 
     std::vector<Vec3> points;
     points.push_back(txPos);
@@ -133,4 +101,27 @@ static PyObject *GetReflectionLoss(PyObject *self, PyObject *args)
     points.push_back(rxPos);
 
     return Py_BuildValue("f f", ReflectedPathLoss(txPos, rxPos, refPos, txFreq, matPerm), GetDelay(points, LIGHT_SPEED));
+}
+
+static PyMethodDef CalculatorFunctions[] = {
+    {"directLoss", (PyCFunction)GetDirectLoss, METH_VARARGS, "Calculate Free Space Path Loss"},
+    {"reflectLoss", (PyCFunction)GetReflectionLoss, METH_VARARGS, "Calculate Reflection Loss"},
+    {"diffractLoss", (PyCFunction)GetDiffractionLoss, METH_VARARGS, "Calculate Diffraction Loss"},
+    {NULL}};
+
+static PyModuleDef CalculatorModule = {
+    PyModuleDef_HEAD_INIT,
+    .m_name = "calculator",
+    .m_doc = "The path loss calculator module",
+    .m_size = -1,
+    .m_methods = CalculatorFunctions,
+};
+
+PyMODINIT_FUNC PyInit_calculator(void)
+{
+    PyObject *m = PyModule_Create(&CalculatorModule);
+    if (m == NULL)
+        return NULL;
+
+    return m;
 }
