@@ -59,7 +59,7 @@ static float GetRefCoe(Vec3 txPos, Vec3 rxPos, Vec3 refPos, float matPerm, bool 
 
 static float ReflectedPathLoss(Vec3 txPos, Vec3 rxPos, Vec3 refPos, float txFreq, float matPerm)
 {
-    float ref_coe = GetRefCoe(txPos, rxPos, refPos, matPerm, true); // assuming all rays are TM
+    float ref_coe = GetRefCoe(txPos, rxPos, refPos, matPerm, false); // assuming all rays are TE
     float distance = Vec3::Distance(txPos, refPos) + Vec3::Distance(refPos, rxPos);
     return 20.0f * log10(distance) + 20.0f * log10(txFreq) - 20.0f * log10(abs(ref_coe)) - 147.55f;
 }
@@ -81,7 +81,7 @@ static float GetVValue(Vec3 txPos, Vec3 rxPos, Vec3 edgePos, float txFreq)
 
 static float GetCValue(float v)
 {
-    return 6.9 + 20.0 * log(sqrt(pow(v - 0.1, 2) + 1) + v - 0.1f);
+    return 6.9 + 20.0 * log10(sqrt(pow(v - 0.1f, 2) + 1) + v - 0.1f);
 }
 
 static std::pair<float, float> GetCorrectionCorine(Vec3 txPos, Vec3 nearTxPos, Vec3 centerPos, Vec3 nearRxPos, Vec3 rxPos)
@@ -133,8 +133,10 @@ static float DiffractedPathLoss(Vec3 txPos, Vec3 rxPos, std::vector<Vec3> edges,
         else
         {
             mainDiffractionLoss = GetCValue(nearRxEdgeV);
-            supportDiffractionLoss = GetCValue(GetVValue(txPos, nearRxEdge, nearRxEdge, txFreq));
+            supportDiffractionLoss = GetCValue(GetVValue(txPos, nearRxEdge, nearTxEdge, txFreq));
         }
+        printf("main loss: %.2f, support loss: %.2f", mainDiffractionLoss, supportDiffractionLoss);
+
         pl += mainDiffractionLoss + supportDiffractionLoss;
         return pl;
     }
@@ -174,7 +176,6 @@ static float DiffractedPathLoss(Vec3 txPos, Vec3 rxPos, std::vector<Vec3> edges,
     float nearRxEdgeV = GetVValue(txPos, rxPos, nearRxEdge, txFreq);
     float maxEdgeV = std::max({nearTxEdgeV, centerEdgeV, nearRxEdgeV});
     float mainDiffractionLoss, supportDiffractionLoss1, supportDiffractionLoss2;
-
     if (nearTxEdgeV == maxEdgeV)
     {
         // near tx edge is main edge
@@ -197,6 +198,7 @@ static float DiffractedPathLoss(Vec3 txPos, Vec3 rxPos, std::vector<Vec3> edges,
         supportDiffractionLoss2 = GetCValue(GetVValue(centerEdge, rxPos, nearRxEdge, txFreq));
     }
     pl += mainDiffractionLoss + supportDiffractionLoss1 + supportDiffractionLoss2;
+
     return pl;
 }
 #endif
