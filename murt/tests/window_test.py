@@ -1,4 +1,4 @@
-from murt.gui import window
+from murt import window
 import numpy as np
 murt_window = window.MurtWindow()
 murt_window.load_scene('./assets/poznan.obj')

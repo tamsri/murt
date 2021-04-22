@@ -2,26 +2,30 @@ import pyglet
 from pyglet.window import Window, key
 from pyglet.gl import *
 from pywavefront import visualization, Wavefront
+from murt.utils import objreader
+from murt.object import Object
+from murt.generator import SceneGenerator
+import numpy as np
 
 
 class MurtWindow(Window):
 
     def __init__(self):
-        self.cam_pos = [-20, -55, -135]
-        self.cam_rot = [20, 0, 0]
+        self.cam_pos = [0,  0, -255]
+        self.cam_rot = [33, -230, 0]
         self.win_size = [640, 480]
         super().__init__(width=self.win_size[0],
                          height=self.win_size[1],
                          resizable=True)
         self.pressed_keys = {}
-        self.scene = None
+        self.scene = []
         self.lines_set = []
-        glClearColor(0.5, 0.5, 0.5, 1)
+        glClearColor(0.9, 0.9, 0.875, 1)
         self.alive = True
-        self.zoom = 60
+        self.zoom = 66
 
     def load_scene(self, file_path):
-        self.scene = Wavefront(file_path, collect_faces=True, strict=False)
+        self.scene.append(Object(file_path))
 
     def on_resize(self, width, height):
         self.win_size = [width, height]
@@ -66,6 +70,16 @@ class MurtWindow(Window):
         self.pressed_keys[pressed_key] = True
 
     def on_key_release(self, pressed_key, mofidier):
+
+        if pressed_key == key.F:
+            print(self.cam_pos)
+            print(self.cam_rot)
+            print(self.zoom)
+        if pressed_key == key.R:
+            self.cam_pos = [0, 0, -180]
+            self.cam_rot = [90, -180, 0]
+            self.zoom = 100
+
         try:
             del self.pressed_keys[pressed_key]
         except:
@@ -101,8 +115,8 @@ class MurtWindow(Window):
         glRotatef(self.cam_rot[2], 0.0, 0.0, 1.0)
         # Draw Scene
         glEnable(GL_DEPTH_TEST)
-        if self.scene is not None:
-            visualization.draw(self.scene)
+        for scene in self.scene:
+            scene.Draw()
         # Draw Lines
         for lines in self.lines_set:
             self.draw_lines(lines)

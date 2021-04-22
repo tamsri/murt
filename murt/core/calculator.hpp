@@ -84,7 +84,7 @@ static float GetCValue(float v)
     return 6.9 + 20.0 * log10(sqrt(pow(v - 0.1f, 2) + 1) + v - 0.1f);
 }
 
-static std::pair<float, float> GetCorrectionCorine(Vec3 txPos, Vec3 nearTxPos, Vec3 centerPos, Vec3 nearRxPos, Vec3 rxPos)
+static std::pair<float, float> GetCorrectionCosine(Vec3 txPos, Vec3 nearTxPos, Vec3 centerPos, Vec3 nearRxPos, Vec3 rxPos)
 {
     txPos.y_ = 0.0f;
     nearTxPos.y_ = 0.0f;

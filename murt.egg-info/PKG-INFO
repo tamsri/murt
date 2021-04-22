@@ -1,0 +1,16 @@
+Metadata-Version: 2.1
+Name: murt
+Version: 0.0.1
+Summary: Python Library for Multipath Ray Tracing
+Home-page: UNKNOWN
+Author: Supawat Tamsri
+Author-email: contact@supawat.dev
+License: MIT
+Description: # MURT 
+        Multipath Radio Tracer is a ray-tracing engine for multipath propagation of radio wave. MURT is a Python package which consits of ray-tracing engine, visualisation, propagation estimation, and the customized OpenAI Gym for machine learning implementations.
+        
+Platform: UNKNOWN
+Requires: numpy
+Requires: pyglet
+Requires: pywavefront
+Description-Content-Type: text/markdown

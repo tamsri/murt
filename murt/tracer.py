@@ -6,15 +6,21 @@ import numpy as np
 
 
 class MurTracer():
-    def __init__(self, scene_path, window=False):
-        vertices, triangles = objreader.read(scene_path)
+    def __init__(self, scene_path=None):
+        if scene_path is not None:
+            vertices, triangles = objreader.read(scene_path)
+            self.core = core.Tracer(vertices, triangles)
+        else:
+            self.core = None
+
+    def loadTracer(self, vertices, triangles):
+        if self.core is not None:
+            del self.core
         self.core = core.Tracer(vertices, triangles)
-        self.window = None
-        if window == True:
-            self.window = MurtWindow()
-            self.window.load_scene(scene_path)
 
     def trace(self, txPos, rxPos):
+        if self.core is None:
+            return
         txPos = np.array(txPos)
         rxPos = np.array(rxPos)
         assert rxPos.shape[0] == 3
@@ -24,11 +30,8 @@ class MurTracer():
         result = self.core.trace(txPos, rxPos)
         return result
 
-    def trace_draw(self, txPos, rxPos):
-        if self.window is None:
-            return
-        results = self.trace(txPos, rxPos)
-        print(results)
+    def ResultsToLines(self, results, txPos, rxPos):
+        lines = []
         for result in results:
             line = None
             if result[0] == 1:
@@ -42,13 +45,10 @@ class MurTracer():
             if result[0] == 3:
                 line = {'points': [tuple(txPos), tuple(result[1]), tuple(rxPos)],
                         'color': (0.7, 0.4, 0.7, 1)}
-            if result[0] == 4:
-                dot = np.array(result[1]) + np.array([0, 0.2, 0])
-                line = {'points': [tuple(result[1]), tuple(dot)],
-                        'color': (1, 0, 0, 1)}
-
+            # if result[0] == 4:
+            #     dot = np.array(result[1]) + np.array([0, 0.2, 0])
+            #     line = {'points': [tuple(result[1]), tuple(dot)],
+            #             'color': (1, 0, 0, 1)}
             if line is not None:
-                self.window.lines_set.append(line)
-
-    def clear_draw(self):
-        self.window.lines_set = []
+                lines.append(line)
+        return lines

@@ -77,7 +77,7 @@ public:
     bool FindEdge(Vec3 leftPos, Vec3 rightPos, Vec3 &edgePos)
     {
         constexpr size_t max_scan = 20;
-        constexpr float min_angle = 0.017f;
+        constexpr float min_angle = 0.0017f;
 
         const float min_x = std::min(leftPos.x_, rightPos.x_);
         const float max_x = std::max(leftPos.x_, rightPos.x_);
@@ -112,7 +112,6 @@ public:
                 upper_ray = check_ray;
             }
         }
-
         // Actually, it's imposible to not intersect,
         // but if it does, return false. If speed is needed, comment out.
         float d = FLT_MAX;
