@@ -80,7 +80,7 @@ my_window.run()
 
 The scene can be rotate by click and drag. the result can be shown below.
 
-![example 1]("https://github.com/tamsri/murt/blob/master/assets/img/ex1.png")
+![Example Image](https://github.com/tamsri/murt/blob/master/assets/img/ex1.png)
 
 #### Procedurally Generated Scene
 
