@@ -237,7 +237,6 @@ public:
     {
         Vec3 top_pos = pos;
         top_pos.y_ = 10000.0f;
-        printf("top pos: %s , pos: %s\n", top_pos.GetString().c_str(), pos.GetString().c_str());
         return IsLOS(pos, top_pos);
     }
 };

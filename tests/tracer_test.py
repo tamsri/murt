@@ -20,11 +20,11 @@ def TracerTest():
     n = 1000
     start = time()
     for i in range(n):
-        while a.isOutdoor(txPos) is not True:
-            txPos = [np.random.random()*200-100, np.random.random() *
+        #while a.isOutdoor(txPos) is not True:
+        txPos = [np.random.random()*200-100, np.random.random() *
                      4+1.5, np.random.random()*200-100]
-        while a.isOutdoor(rxPos) is not True:
-            rxPos = [np.random.random()*200-100, np.random.random() +
+        #while a.isOutdoor(rxPos) is not True:
+        rxPos = [np.random.random()*200-100, np.random.random() +
                      1.5, np.random.random()*200-100]
         results = a.trace(txPos, rxPos)
         window.lines_set += a.ResultsToLines(results, txPos, rxPos)

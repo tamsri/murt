@@ -29,7 +29,7 @@ class MurTracer():
 
     def trace(self, txPos, rxPos):
         if self.core is None:
-            return
+            return None
         txPos = np.array(txPos)
         rxPos = np.array(rxPos)
         assert rxPos.shape[0] == 3
@@ -66,10 +66,11 @@ class MurTracer():
         losses = {'total_dB': None, 'signals': []}
 
         total_linear = 0
-        loss_dB = 500
+        loss_dB = None
         delay = 0
         if results is None:
             return None
+
         for result in results:
             if(result[0] == 1):
                 loss_dB, delay = calculator.directLoss(txPos, rxPos, txFreq)
@@ -86,7 +87,7 @@ class MurTracer():
             else:
                 return None
             losses['signals'].append([loss_dB, delay])
-            total_linear += np.power(10, loss_dB/10)
-        losses['total_dB'] = 10*np.log10(total_linear)
+            total_linear += np.power(10, -loss_dB/10)
 
+        losses['total_dB'] = -10*np.log10(total_linear)
         return losses

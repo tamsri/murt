@@ -87,7 +87,6 @@ static PyObject *IsOutdoor(RayTracerObject *self, PyObject *args)
     position.x_ = *(float *)PyArray_GETPTR1(arrObj, 0);
     position.y_ = *(float *)PyArray_GETPTR1(arrObj, 1);
     position.z_ = *(float *)PyArray_GETPTR1(arrObj, 2);
-    printf("in pos: %s\n", position.GetString().c_str());
 
     return Py_BuildValue("i", (self->tracer)->IsOutdoor(position));
 }
