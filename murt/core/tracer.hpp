@@ -73,7 +73,6 @@ public:
         return res;
     }
 
-    // TODO[]: get edges
     bool FindEdge(Vec3 leftPos, Vec3 rightPos, Vec3 &edgePos)
     {
         constexpr size_t max_scan = 20;
@@ -232,11 +231,23 @@ public:
 
         return records;
     };
+
     bool IsOutdoor(Vec3 pos)
     {
         Vec3 top_pos = pos;
         top_pos.y_ = 10000.0f;
         return IsLOS(pos, top_pos);
+    }
+
+    float HitNearest(Vec3 fromPos, Vec3 toPos)
+    {
+        float hit_distance;
+        Ray ray(fromPos, toPos - fromPos);
+
+        if (scene_->IsIntersect(ray, hit_distance))
+            return hit_distance;
+
+        return -1.0f;
     }
 };
 

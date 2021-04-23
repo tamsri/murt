@@ -63,11 +63,10 @@ public:
             left_ = nullptr;
         }
     }
-    // TODO[]: Box-Ray intersection
+
     bool IsIntersect(const Ray &ray)
     {
         // Check if the ray is inside the box.
-        // TODO[]: Check if this on top runs faster.
         /*if (ray.origin_.x_ > min_bound_.x_ && ray.origin_.x_ < max_bound_.x &&
             ray.origin_.y_ > min_bound_.y_ && ray.origin_.y_ < max_bound_.y_ &&
             ray.origin_.z_ > min_bound_.y_ && ray.origin_.z_ < max_bound_.z_)
@@ -97,7 +96,6 @@ class BVH
 {
 public:
     Box *root_;
-    // TODO[]: Build tree
     BVH(std::vector<Triangle *> &triangles)
     {
         root_ = new Box(triangles);
@@ -109,7 +107,6 @@ public:
         root_ = nullptr;
     }
 
-    // TODO[]: Tree intersection, scanning from children
     bool IsIntersect(const Ray &ray, float &closest_distance)
     {
         std::queue<Box *> hot_boxes;
@@ -145,7 +142,6 @@ public:
         return is_hit_once;
     }
 
-    // TODO[X]: Make Children
     static void MakeChildren(Box *parent, int level)
     {
         //printf("depth: %d, parents members: %d \n", level, parent->members_.size());

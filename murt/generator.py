@@ -66,18 +66,18 @@ class SceneGenerator():
         z_scale = self.generator.uniform(d_min,
                                          d_max)
 
-        building.Resize(x_scale, y_scale, z_scale)
+        building.resize(x_scale, y_scale, z_scale)
 
         # Generate Position
         x = self.generator.uniform(self.x_min, self.x_max)
         z = self.generator.uniform(self.z_min, self.z_max)
-        building.Reposition(x, 0, z)
+        building.reposition(x, 0, z)
 
         # Generate Rotation
         rotate = self.generator.normal(90, 5)
         if self.generator.random() < 0.5:
             rotate += 90
-        building.Rotate(0, rotate, 0)
+        building.rotate_obj(0, rotate, 0)
         return building
 
     def generate_scene(self):

@@ -77,6 +77,25 @@ static PyObject *Trace(RayTracerObject *self, PyObject *args)
     return py_records;
 }
 
+static PyObject *HitNearest(RayTracerObject *self, PyObject *args)
+{
+    PyArrayObject *txArrObj;
+    PyArrayObject *rxArrObj;
+    if (!PyArg_ParseTuple(args, "O|O", &txArrObj, &rxArrObj))
+        return NULL;
+
+    Vec3 fromPos, toPos;
+    fromPos.x_ = *(float *)PyArray_GETPTR1(txArrObj, 0);
+    fromPos.y_ = *(float *)PyArray_GETPTR1(txArrObj, 1);
+    fromPos.z_ = *(float *)PyArray_GETPTR1(txArrObj, 2);
+
+    toPos.x_ = *(float *)PyArray_GETPTR1(rxArrObj, 0);
+    toPos.y_ = *(float *)PyArray_GETPTR1(rxArrObj, 1);
+    toPos.z_ = *(float *)PyArray_GETPTR1(rxArrObj, 2);
+
+    return Py_BuildValue("f", (self->tracer)->HitNearest(fromPos, toPos));
+}
+
 static PyObject *IsOutdoor(RayTracerObject *self, PyObject *args)
 {
     PyArrayObject *arrObj;
@@ -102,8 +121,6 @@ static PyObject *RayTracerObjectNew(PyTypeObject *type, PyObject *args, PyObject
     self = (RayTracerObject *)type->tp_alloc(type, 0);
     if (self != NULL)
     {
-
-        // TODO[X]: Read args to triangles
         PyArrayObject *verticesArray;
         PyArrayObject *trianglesArray;
 
@@ -119,7 +136,6 @@ static PyObject *RayTracerObjectNew(PyTypeObject *type, PyObject *args, PyObject
         if (vert_dim_m != 3 || tri_dim_m != 3)
             return NULL; // invalid input TODO[?]: maybe, bug it later.
 
-        // TODO[]: Convert objects into vector<Triangle *> triangles
         std::unordered_map<size_t, Vec3> vertices_dict;
         // prepare vertices dictionary.
         for (size_t i = 0; i < vert_dim_n; ++i)
@@ -145,7 +161,6 @@ static PyObject *RayTracerObjectNew(PyTypeObject *type, PyObject *args, PyObject
             triangles.push_back(new Triangle(p1Pos, p2Pos, p3Pos));
         }
         //printf("triangles : %d\n", triangles.size());
-        // TODO[]: Send triangles to ray tracer
         self->tracer = new Tracer(triangles);
     }
     return (PyObject *)self;
@@ -177,6 +192,7 @@ static int RayTracerObjectInit(RayTracerObject *self, PyObject *args, PyObject *
 static PyMethodDef RayTracerMethods[] = {
     {"trace", (PyCFunction)Trace, METH_VARARGS, "Trace rays from tx to rx"},
     {"isOutdoor", (PyCFunction)IsOutdoor, METH_VARARGS, "Check if the input position is indoor"},
+    {"hitNearest", (PyCFunction)HitNearest, METH_VARARGS, "Check the nearest hit distance"},
     {"getId", (PyCFunction)GetID, METH_NOARGS, "Return ID of Tracer"},
     {NULL}
     //{NULL, NULL, 0, NULL},

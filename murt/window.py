@@ -116,7 +116,7 @@ class MurtWindow(Window):
         # Draw Scene
         glEnable(GL_DEPTH_TEST)
         for scene in self.scene:
-            scene.Draw()
+            scene.draw()
         # Draw Lines
         for lines in self.lines_set:
             self.draw_lines(lines)

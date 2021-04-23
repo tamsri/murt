@@ -1,10 +1,7 @@
-from murt.generator import SceneGenerator
-from murt.window import MurtWindow
+from murt import scene_generator, mwindow
 
-
-a = SceneGenerator(888)
-a.Generate()
-window = MurtWindow()
+a = scene_generator(888)
+a.generate()
+window = mwindow()
 window.scene = a.sceneComponents
-a.GetTriangles()
 window.run()

@@ -11,19 +11,19 @@ class Object():
             1, 1, 1], [0, 0, 0], [0, 0, 0]
         self.vertices, self.triangles = objreader.read(file_path)
 
-    def GetTriangles(self):
+    def get_triangles(self):
         return self.vertices, self.triangles
 
-    def Resize(self, x, y, z):
+    def resize(self, x, y, z):
         self.scale = (float(x), float(y), float(z))
 
-    def Reposition(self, x, y, z):
+    def reposition(self, x, y, z):
         self.translate = (float(x), float(y), float(z))
 
-    def Rotate(self, x, y, z):
+    def rotate_obj(self, x, y, z):
         self.rotate = (float(x), float(y), float(z))
 
-    def Draw(self):
+    def draw(self):
         glPushMatrix()
         # Rotation
         # glRotatef(self.rotate[0], 1.0, 0.0, 0.0) #unused

@@ -1,4 +1,4 @@
-from murt.apps.randomer import RandomRunner
+from murt.apps import randomer
 
-a = RandomRunner()
+a = randomer()
 a.run()
