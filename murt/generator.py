@@ -6,6 +6,7 @@ import pywavefront
 from pywavefront import Wavefront
 from murt.utils import objreader
 from murt.object import Object
+
 COMPONENT_PATH = os.path.join(sys.prefix, "murt-assets")
 
 pywavefront.configure_logging(

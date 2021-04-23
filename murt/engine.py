@@ -1,4 +1,4 @@
-from murt import core
+from murt import core, calculator
 from murt.window import MurtWindow
 from murt.utils import objreader
 
@@ -17,6 +17,15 @@ class MurTracer():
         if self.core is not None:
             del self.core
         self.core = core.Tracer(vertices, triangles)
+
+    def isOutdoor(self, pos):
+        pos = np.array(pos)
+        assert pos.shape[0] == 3
+        pos = np.array(pos).astype('float32')
+
+        result = self.core.isOutdoor(pos)
+        print(f'isoutdoor: {result}')
+        return self.core.isOutdoor(pos) != 0
 
     def trace(self, txPos, rxPos):
         if self.core is None:
@@ -52,3 +61,32 @@ class MurTracer():
             if line is not None:
                 lines.append(line)
         return lines
+
+    def TotalPathLoss(self, txPos, rxPos, results, txFreq=2.4e9, matPerm=5.31):
+        losses = {'total_dB': None, 'signals': []}
+
+        total_linear = 0
+        loss_dB = 500
+        delay = 0
+        if results is None:
+            return None
+        for result in results:
+            if(result[0] == 1):
+                loss_dB, delay = calculator.directLoss(txPos, rxPos, txFreq)
+
+            elif(result[0] == 2):
+                edges = list(map(list, result[1]))
+                loss_dB, delay = calculator.diffractLoss(
+                    txPos, rxPos, edges, txFreq)
+            elif(result[0] == 3):
+                refPos = list(result[1])
+                loss_dB, delay = calculator.reflectLoss(txPos, rxPos,
+                                                        refPos, txFreq,
+                                                        matPerm)
+            else:
+                return None
+            losses['signals'].append([loss_dB, delay])
+            total_linear += np.power(10, loss_dB/10)
+        losses['total_dB'] = 10*np.log10(total_linear)
+
+        return losses

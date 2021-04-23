@@ -135,7 +135,7 @@ static float DiffractedPathLoss(Vec3 txPos, Vec3 rxPos, std::vector<Vec3> edges,
             mainDiffractionLoss = GetCValue(nearRxEdgeV);
             supportDiffractionLoss = GetCValue(GetVValue(txPos, nearRxEdge, nearTxEdge, txFreq));
         }
-        printf("main loss: %.2f, support loss: %.2f", mainDiffractionLoss, supportDiffractionLoss);
+        //printf("main loss: %.2f, support loss: %.2f", mainDiffractionLoss, supportDiffractionLoss);
 
         pl += mainDiffractionLoss + supportDiffractionLoss;
         return pl;

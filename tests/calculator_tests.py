@@ -31,11 +31,13 @@ def ReflectPathTest():
 
     def calculate(txPos, rxPos, refPos, txFreq, matPerm):
         start = time.time()
-        a = calculator.reflectLoss(txPos, rxPos, refPos, txFreq, matPerm)
+        a = calculator.reflectLoss(txPos, rxPos,
+                                   refPos, txFreq, matPerm)
         end = time.time()
         duration = end-start
         print(
-            f'tx:{txPos}, rx:{rxPos}, ref:{refPos}, freq: {txFreq}, pl = {a}')
+            f'tx:{txPos}, rx:{rxPos}, ref:{refPos}, freq: {txFreq}, pl = {a}'
+        )
         return a[0]
 
     rxPos = [34, 1.5, -59]

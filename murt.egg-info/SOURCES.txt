@@ -24,9 +24,9 @@ assets/components/ground.obj
 assets/components/house.mtl
 assets/components/house.obj
 murt/__init__.py
+murt/engine.py
 murt/generator.py
 murt/object.py
-murt/tracer.py
 murt/window.py
 murt.egg-info/PKG-INFO
 murt.egg-info/SOURCES.txt
@@ -37,4 +37,3 @@ murt/core/calculator.cpp
 murt/core/core.cpp
 murt/utils/__init__.py
 murt/utils/objreader.py
-murt/utils/scene_generator.py

@@ -7,11 +7,11 @@ all:
 	python setup.py install
 	pip install .
 test:
-	#python ./murt/tests/core_tests.py
-	#python ./murt/tests/tracer_test.py
-	#python ./murt/tests/calculator_tests.py
-	#python ./murt/tests/generator_test.py
-	python ./murt/tests/randomer_test.py
+	#python ./tests/core_tests.py
+	python ./tests/tracer_test.py
+	#python ./tests/calculator_tests.py
+	#python ./tests/generator_test.py
+	#python ./tests/randomer_test.py
 tai:
 	make all
 	make test
