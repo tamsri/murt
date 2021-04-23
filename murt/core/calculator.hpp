@@ -7,7 +7,6 @@
 #include <vector>
 
 #include "vec3.hpp"
-
 #define LIGHT_SPEED 299792458.0f
 #define AIR_IOR 1.00029f
 
@@ -84,25 +83,25 @@ static float GetCValue(float v)
     return 6.9 + 20.0 * log10(sqrt(pow(v - 0.1f, 2) + 1) + v - 0.1f);
 }
 
-static std::pair<float, float> GetCorrectionCosine(Vec3 txPos, Vec3 nearTxPos, Vec3 centerPos, Vec3 nearRxPos, Vec3 rxPos)
-{
-    txPos.y_ = 0.0f;
-    nearTxPos.y_ = 0.0f;
-    centerPos.y_ = 0.0f;
-    nearTxPos.y_ = 0.0f;
-    rxPos.y_ = 0.0f;
-
-    float d1 = Vec3::Distance(txPos, nearTxPos);
-    float d2 = Vec3::Distance(nearTxPos, centerPos);
-    float d3 = Vec3::Distance(centerPos, nearRxPos);
-    float d4 = Vec3::Distance(nearRxPos, rxPos);
-
-    std::pair<float, float> cosines;
-    cosines.first = sqrt((d1 * (d3 + d4)) / ((d1 + d2) * (d2 + d3 + d4)));
-    cosines.second = sqrt((d4 * (d1 + d2)) / ((d3 + d4) * (d2 + d3 + d1)));
-
-    return cosines;
-}
+//static std::pair<float, float> GetCorrectionCosine(Vec3 txPos, Vec3 nearTxPos, Vec3 centerPos, Vec3 nearRxPos, Vec3 rxPos)
+//{
+//    txPos.y_ = 0.0f;
+//    nearTxPos.y_ = 0.0f;
+//    centerPos.y_ = 0.0f;
+//    nearTxPos.y_ = 0.0f;
+//    rxPos.y_ = 0.0f;
+//
+//    float d1 = Vec3::Distance(txPos, nearTxPos);
+//    float d2 = Vec3::Distance(nearTxPos, centerPos);
+//    float d3 = Vec3::Distance(centerPos, nearRxPos);
+//    float d4 = Vec3::Distance(nearRxPos, rxPos);
+//
+//    std::pair<float, float> cosines;
+//    cosines.first = sqrt((d1 * (d3 + d4)) / ((d1 + d2) * (d2 + d3 + d4)));
+//    cosines.second = sqrt((d4 * (d1 + d2)) / ((d3 + d4) * (d2 + d3 + d1)));
+//
+//    return cosines;
+//}
 
 static float DiffractedPathLoss(Vec3 txPos, Vec3 rxPos, std::vector<Vec3> edges, float txFreq)
 {
@@ -135,7 +134,8 @@ static float DiffractedPathLoss(Vec3 txPos, Vec3 rxPos, std::vector<Vec3> edges,
             mainDiffractionLoss = GetCValue(nearRxEdgeV);
             supportDiffractionLoss = GetCValue(GetVValue(txPos, nearRxEdge, nearTxEdge, txFreq));
         }
-        //printf("main loss: %.2f, support loss: %.2f", mainDiffractionLoss, supportDiffractionLoss);
+        if(isnan(supportDiffractionLoss)) supportDiffractionLoss = 0.0;
+      //  printf("main loss: %.2f, support loss: %.2f\n", mainDiffractionLoss, supportDiffractionLoss);
 
         pl += mainDiffractionLoss + supportDiffractionLoss;
         return pl;
@@ -197,6 +197,10 @@ static float DiffractedPathLoss(Vec3 txPos, Vec3 rxPos, std::vector<Vec3> edges,
         supportDiffractionLoss1 = GetCValue(GetVValue(txPos, centerEdge, nearTxEdge, txFreq));
         supportDiffractionLoss2 = GetCValue(GetVValue(centerEdge, rxPos, nearRxEdge, txFreq));
     }
+    if(isnan(supportDiffractionLoss1)) supportDiffractionLoss1 = 0.0f;
+    if(isnan(supportDiffractionLoss2)) supportDiffractionLoss2 = 0.0f;
+    //printf("main loss: %.2f, support loss 1: %.2f, support loss 2: %.2f\n", mainDiffractionLoss,
+    //              supportDiffractionLoss1, supportDiffractionLoss2);
     pl += mainDiffractionLoss + supportDiffractionLoss1 + supportDiffractionLoss2;
 
     return pl;

@@ -179,10 +179,9 @@ public:
 
     Vec3 GetMirrorPoint(Vec3 pos, Triangle *triangle)
     {
-        // My invented mirror formula from high school's knowledge ;) - Supawat Tamsri 😎
+        // My invented mirror formula from high school's knowledge😎
         Vec3 normal = triangle->normal_;
         float t = (Vec3::Dot(normal, triangle->p2_) - Vec3::Dot(pos, normal)) / (Vec3::Dot(normal, normal));
-
         return pos + normal * 2 * t;
     }
 

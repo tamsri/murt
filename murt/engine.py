@@ -5,7 +5,7 @@ from murt.utils import objreader
 import numpy as np
 
 
-class MurTracer():
+class MurTracer:
     def __init__(self, scene_path=None):
         if scene_path is not None:
             vertices, triangles = objreader.read(scene_path)
@@ -13,77 +13,69 @@ class MurTracer():
         else:
             self.core = None
 
-    def loadTracer(self, vertices, triangles):
+    def load_scene(self, vertices, triangles):
         if self.core is not None:
             del self.core
         self.core = core.Tracer(vertices, triangles)
 
-    def isOutdoor(self, pos):
+    def is_outdoor(self, pos):
         pos = np.array(pos)
         assert pos.shape[0] == 3
         pos = np.array(pos).astype('float32')
-
-        result = self.core.isOutdoor(pos)
-        print(f'isoutdoor: {result}')
         return self.core.isOutdoor(pos) != 0
 
-    def trace(self, txPos, rxPos):
+    def trace(self, tx_pos, rx_pos):
         if self.core is None:
             return None
-        txPos = np.array(txPos)
-        rxPos = np.array(rxPos)
-        assert rxPos.shape[0] == 3
-        assert txPos.shape[0] == 3
-        txPos = txPos.astype('float32')
-        rxPos = rxPos.astype('float32')
-        result = self.core.trace(txPos, rxPos)
+        tx_pos = np.array(tx_pos)
+        rx_pos = np.array(rx_pos)
+        assert rx_pos.shape[0] == 3
+        assert tx_pos.shape[0] == 3
+        tx_pos = tx_pos.astype('float32')
+        rx_pos = rx_pos.astype('float32')
+        result = self.core.trace(tx_pos, rx_pos)
         return result
 
-    def ResultsToLines(self, results, txPos, rxPos):
+    @staticmethod
+    def result_to_lines(results, tx_pos, rx_pos):
         lines = []
         for result in results:
             line = None
             if result[0] == 1:
-                line = {'points': [tuple(txPos), tuple(rxPos)],
+                line = {'points': [tuple(tx_pos), tuple(rx_pos)],
                         'color': (0, 0.7, 0.3, 1)}
             if result[0] == 2:
-                line = {'points': [tuple(txPos)], 'color': (0, 0, .9, 1)}
+                line = {'points': [tuple(tx_pos)], 'color': (0, 0, .9, 1)}
                 for point in result[1]:
                     line['points'].append(tuple(point))
-                line['points'].append(tuple(rxPos))
+                line['points'].append(tuple(rx_pos))
             if result[0] == 3:
-                line = {'points': [tuple(txPos), tuple(result[1]), tuple(rxPos)],
+                line = {'points': [tuple(tx_pos), tuple(result[1]), tuple(rx_pos)],
                         'color': (0.7, 0.4, 0.7, 1)}
-            # if result[0] == 4:
-            #     dot = np.array(result[1]) + np.array([0, 0.2, 0])
-            #     line = {'points': [tuple(result[1]), tuple(dot)],
-            #             'color': (1, 0, 0, 1)}
             if line is not None:
                 lines.append(line)
         return lines
 
-    def TotalPathLoss(self, txPos, rxPos, results, txFreq=2.4e9, matPerm=5.31):
-        losses = {'total_dB': None, 'signals': []}
-
-        total_linear = 0
-        loss_dB = None
-        delay = 0
+    @staticmethod
+    def get_total_loss(tx_pos, rx_pos, results, tx_freq=2.4e9, material_permittivity=5.31):
         if results is None:
             return None
 
+        losses = {'total_dB': None, 'signals': []}
+        total_linear = 0
         for result in results:
-            if(result[0] == 1):
-                loss_dB, delay = calculator.directLoss(txPos, rxPos, txFreq)
+            if result[0] == 1:
+                loss_dB, delay = calculator.directLoss(tx_pos, rx_pos, tx_freq)
 
-            elif(result[0] == 2):
+            elif result[0] == 2:
                 edges = list(map(list, result[1]))
                 loss_dB, delay = calculator.diffractLoss(
-                    txPos, rxPos, edges, txFreq)
-            elif(result[0] == 3):
+                    tx_pos, rx_pos, edges, tx_freq)
+            elif result[0] == 3:
                 refPos = list(result[1])
-                loss_dB, delay = calculator.reflectLoss(txPos, rxPos,
-                                                        refPos, txFreq,
-                                                        matPerm)
+                loss_dB, delay = calculator.reflectLoss(tx_pos, rx_pos,
+                                                        refPos, tx_freq,
+                                                        material_permittivity)
             else:
                 return None
             losses['signals'].append([loss_dB, delay])

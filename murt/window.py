@@ -69,7 +69,7 @@ class MurtWindow(Window):
             self.alive = False
         self.pressed_keys[pressed_key] = True
 
-    def on_key_release(self, pressed_key, mofidier):
+    def on_key_release(self, pressed_key, modifier):
 
         if pressed_key == key.F:
             print(self.cam_pos)
@@ -128,6 +128,6 @@ class MurtWindow(Window):
         self.render()
 
     def run(self):
-        while self.alive == True:
+        while self.alive:
             event = self.dispatch_events()
             self.render()

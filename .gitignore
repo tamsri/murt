@@ -1,8 +1,6 @@
 build/
 .vscode/
 .idea/
-
 __pycache__/
 dist
-
 murt.egg-info/

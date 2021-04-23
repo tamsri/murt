@@ -2,6 +2,7 @@
 
 #include <Python.h>
 
+
 #include "calculator.hpp"
 
 static PyObject *GetDirectLoss(PyObject *self, PyObject *args)

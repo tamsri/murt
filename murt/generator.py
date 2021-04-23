@@ -3,8 +3,6 @@ import sys
 import os
 import logging
 import pywavefront
-from pywavefront import Wavefront
-from murt.utils import objreader
 from murt.object import Object
 
 COMPONENT_PATH = os.path.join(sys.prefix, "murt-assets")
@@ -31,7 +29,7 @@ class SceneGenerator():
 
         self.globalVertices, self.globalIndice = None, None
 
-    def Generate(self):
+    def generate(self):
         # Generate ground
         ground = Object(self.ground_path)
         self.sceneComponents.append(ground)
@@ -42,17 +40,17 @@ class SceneGenerator():
         for i in range(n_building):
             type_build = self.generator.random()
             if type_build < cube_percentage:
-                building = self.GenerateObj(obj_path=self.cube_path)
+                building = self.generate_object(obj_path=self.cube_path)
             else:
-                building = self.GenerateObj(obj_path=self.house_path,
-                                            h_min=3, h_max=15, w_min=7, w_max=15,
-                                            d_min=7, d_max=20)
+                building = self.generate_object(obj_path=self.house_path,
+                                                h_min=3, h_max=15, w_min=7, w_max=15,
+                                                d_min=7, d_max=20)
             self.sceneComponents.append(building)
         # Calculate triangles
 
-    def GenerateObj(self, obj_path=None, h_min=5,
-                    h_max=30, w_min=7, w_max=30,
-                    d_min=6, d_max=30):
+    def generate_object(self, obj_path=None, h_min=5,
+                        h_max=30, w_min=7, w_max=30,
+                        d_min=6, d_max=30):
         if obj_path is None:
             obj_path = self.cube_path
 
@@ -82,14 +80,14 @@ class SceneGenerator():
         building.Rotate(0, rotate, 0)
         return building
 
-    def GetScene(self):
+    def generate_scene(self):
         return self.sceneComponents
 
-    def GetTriangles(self):
+    def get_triangles(self):
         self.globalVertices, self.globalIndice = None, None
 
         for component in self.sceneComponents:
-            vertices, indexes = component.GetTriangles()
+            vertices, indexes = component.get_triangles()
 
             # scale
             vertices *= component.scale
@@ -110,8 +108,6 @@ class SceneGenerator():
                 self.globalIndice = np.array(indexes)
             else:
                 indexes += self.globalVertices.shape[0]
-                # print(
-                #    f'index {indexes.shape}\nglobal: {self.globalIndice.shape}')
                 self.globalIndice = np.append(
                     self.globalIndice, indexes, axis=0)
 
