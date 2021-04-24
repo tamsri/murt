@@ -12,6 +12,7 @@ test:
 	python ./tests/calculator_tests.py
 	python ./tests/generator_test.py
 	python ./tests/randomer_test.py
+	python ./tests/depth_test.py
 tai:
 	make all
 	make test

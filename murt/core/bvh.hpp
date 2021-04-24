@@ -125,7 +125,7 @@ public:
             // Final Box intersected
             if (current_box->alone_)
             {
-                float current_distance = 0.0f;
+                float current_distance = FLT_MAX;
                 if (current_box->members_[0]->IsIntersect(ray, current_distance))
                 {
                     closest_distance = std::min(current_distance, closest_distance);

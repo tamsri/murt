@@ -241,7 +241,7 @@ public:
 
     float HitNearest(Vec3 fromPos, Vec3 toPos)
     {
-        float hit_distance;
+        float hit_distance = FLT_MAX;
         Ray ray(fromPos, toPos - fromPos);
 
         if (scene_->IsIntersect(ray, hit_distance))

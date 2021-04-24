@@ -1,5 +1,4 @@
 from murt import core, calculator
-from murt.window import MurtWindow
 from murt.utils import objreader
 
 import numpy as np
@@ -23,6 +22,16 @@ class MurTracer:
         assert pos.shape[0] == 3
         pos = np.array(pos).astype('float32')
         return self.core.isOutdoor(pos) != 0
+
+    def hit_nearest(self, fromPos, toPos):
+        fromPos = np.array(fromPos)
+        assert fromPos.shape[0] == 3
+        toPos = np.array(toPos)
+        assert toPos.shape[0] == 3
+        fromPos = fromPos.astype('float32')
+        toPos = toPos.astype('float32')
+        distance = self.core.hitNearest(fromPos, toPos)
+        return distance
 
     def trace(self, tx_pos, rx_pos):
         if self.core is None:

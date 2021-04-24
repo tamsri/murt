@@ -1,9 +1,11 @@
 import numpy as np
+import pandas as pd
 import sys
 import os
 import logging
 import pywavefront
 from murt.object import Object
+from murt import tracer
 
 COMPONENT_PATH = os.path.join(sys.prefix, "murt-assets")
 
@@ -26,10 +28,12 @@ class SceneGenerator():
         self.z_max = 140
 
         self.generator = np.random.default_rng(seed)
-
         self.globalVertices, self.globalIndice = None, None
 
     def generate(self):
+        self.globalVertices = None
+        self.globalIndice = None
+        self.sceneComponents = []
         # Generate ground
         ground = Object(self.ground_path)
         self.sceneComponents.append(ground)
@@ -40,13 +44,17 @@ class SceneGenerator():
         for i in range(n_building):
             type_build = self.generator.random()
             if type_build < cube_percentage:
-                building = self.generate_object(obj_path=self.cube_path)
+                building = self.generate_object(obj_path=self.cube_path,
+                                                h_min=7, h_max=25, w_min=7, w_max=30,
+                                                d_min=7, d_max=30)
             else:
                 building = self.generate_object(obj_path=self.house_path,
-                                                h_min=3, h_max=15, w_min=7, w_max=15,
+                                                h_min=5, h_max=20, w_min=7, w_max=15,
                                                 d_min=7, d_max=20)
             self.sceneComponents.append(building)
         # Calculate triangles
+        self.prepare_triangles()
+        return
 
     def generate_object(self, obj_path=None, h_min=5,
                         h_max=30, w_min=7, w_max=30,
@@ -74,24 +82,29 @@ class SceneGenerator():
         building.reposition(x, 0, z)
 
         # Generate Rotation
-        rotate = self.generator.normal(90, 5)
+
+        if self.generator.random() < 0.5:
+            rotate = 0
+        else:
+            rotate = self.generator.normal(90, 3)
+
         if self.generator.random() < 0.5:
             rotate += 90
         building.rotate_obj(0, rotate, 0)
         return building
 
-    def generate_scene(self):
+    def get_scene(self):
         return self.sceneComponents
 
     def get_triangles(self):
-        self.globalVertices, self.globalIndice = None, None
+        return self.globalVertices, self.globalIndice
 
+    def prepare_triangles(self):
+        self.globalVertices, self.globalIndice = None, None
         for component in self.sceneComponents:
             vertices, indexes = component.get_triangles()
-
             # scale
             vertices *= component.scale
-
             # rotate (yaw)
             angle = np.deg2rad(component.rotate[1])
             cos_angle = np.cos(-angle)
@@ -118,4 +131,32 @@ class SceneGenerator():
                 self.globalVertices = np.append(
                     self.globalVertices, vertices, axis=0)
 
-        return self.globalVertices, self.globalIndice
+    def get_depth_map(self, x_min, x_max, x_n, z_min, z_max, z_n):
+        assert x_min < x_max
+        assert z_min < z_max
+        assert (x_n > 0) and (z_n > 0)
+
+        current_tracer = tracer()
+        current_tracer.load_scene(*self.get_triangles())
+
+        upper_y = 1000
+        below_y = -1000
+        data_depth = []
+        data_frame = None
+
+        for current_x in np.linspace(x_min, x_max, x_n):
+            for current_z in np.linspace(z_min, z_max, z_n):
+                from_pos = [current_x, upper_y, current_z]
+                to_pos = [current_x, below_y, current_z]
+                distance = current_tracer.hit_nearest(
+                    from_pos, to_pos)
+                # in case if there is no ground, skip
+                if distance < 0:
+                    continue
+                depth = upper_y-distance
+                data_row = {'x': current_x, 'z': current_z, 'depth': depth}
+                # print(distance)
+                data_depth.append(data_row)
+
+        data_frame = pd.DataFrame(data_depth)
+        return data_frame

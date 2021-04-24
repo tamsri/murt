@@ -4,3 +4,4 @@ build/
 __pycache__/
 dist
 murt.egg-info/
+.DS_Store
