@@ -1,25 +1,17 @@
 #ifndef TRACER_H
 #define TRACER_H
 
+#include <mutex>
 #include <vector>
 #include <math.h>
 
+#include "record.hpp"
+#include "vec3.hpp"
 #include "triangle.hpp"
 #include "bvh.hpp"
 
-enum RecordType
-{
-    Direct = 0,
-    Diffracted = 1,
-    SingleReflected = 2,
-    MirrorRecord = 3
-};
+#include "calculator.hpp"
 
-struct Record
-{
-    RecordType type;
-    std::vector<Vec3> points;
-};
 
 class Tracer
 {
@@ -29,9 +21,13 @@ public:
     BVH *scene_;
     std::vector<Triangle *> triangles_;
 
+    std::mutex mutex_;
+    std::vector<std::vector<float> > volume_result_;
+
     Tracer(std::vector<Triangle *> &triangles) : id_(global_id++), triangles_(triangles)
     {
         scene_ = new BVH(triangles_);
+        volume_result_.clear();
     };
 
     ~Tracer()
@@ -40,6 +36,7 @@ public:
         for (Triangle *triangle : triangles_)
             delete triangle;
         triangles_.clear();
+        volume_result_.clear();
     };
 
     // IsHit is a primitive way of hit search with brute force approach
@@ -249,8 +246,37 @@ public:
 
         return -1.0f;
     }
+
+    void TraceAsync(Vec3 txPos, Vec3 rxPos, float txFreq, float matPerm)
+    {
+        std::vector<float> result;
+        result.push_back(rxPos.x_);
+        result.push_back(rxPos.y_);
+        result.push_back(rxPos.z_);
+        if (!this->IsOutdoor(txPos) || !this->IsOutdoor(rxPos))
+        {
+            result.push_back(-1.0f);
+        }
+        else
+        {
+            std::vector<Record> records = this->Trace(txPos, rxPos);
+            if (records.empty())
+            {
+                result.push_back(-1.0f);
+            }
+            else
+            {
+                float total_path_loss = GetTotalPathLoss(txPos, rxPos, txFreq, matPerm, records);
+                result.push_back(total_path_loss);
+            }
+        }
+
+        mutex_.lock();
+        this->volume_result_.push_back(result);
+        mutex_.unlock();
+    }
 };
 
 unsigned int Tracer::global_id = 0;
 
-#endif
+#endif //!TRACER_H

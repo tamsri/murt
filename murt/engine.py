@@ -2,6 +2,7 @@ from murt import core, calculator
 from murt.utils import objreader
 
 import numpy as np
+import pandas as pd
 
 
 class MurTracer:
@@ -45,6 +46,64 @@ class MurTracer:
         result = self.core.trace(tx_pos, rx_pos)
         return result
 
+    def get_depth_map(self, x_min, x_max, x_n, z_min, z_max, z_n):
+        assert x_min < x_max
+        assert z_min < z_max
+        assert (x_n > 0) and (z_n > 0)
+
+        upper_y = 1000
+        below_y = -1000
+        data_depth = []
+        data_frame = None
+
+        for current_x in np.linspace(x_min, x_max, x_n):
+            for current_z in np.linspace(z_min, z_max, z_n):
+                from_pos = [current_x, upper_y, current_z]
+                to_pos = [current_x, below_y, current_z]
+                distance = self.hit_nearest(from_pos, to_pos)
+                # in case if there is no ground, skip
+                if distance < 0:
+                    continue
+                depth = upper_y-distance
+                data_row = {'x': current_x, 'z': current_z, 'depth': depth}
+                # print(distance)
+                data_depth.append(data_row)
+
+        data_frame = pd.DataFrame(data_depth)
+        return data_frame
+
+    def get_traced_volume(self,
+                          x_min, x_max, x_n,
+                          y_min, y_max, y_n,
+                          z_min, z_max, z_n,
+                          tx_pos, tx_freq, mat_perm):
+        # check input
+        assert x_min < x_max and x_n > 0
+        assert y_min < y_max and y_n > 0
+        assert z_min < z_max and z_n > 0
+        tx_pos = np.array(tx_pos)
+        assert tx_pos.shape[0] == 3
+        tx_pos = tx_pos.astype('float32')
+        tx_freq = float(tx_freq)
+        mat_perm = float(mat_perm)
+        # trace
+        results = self.core.traceVolume(x_min, x_max, x_n,
+                                        y_min, y_max, y_n,
+                                        z_min, z_max, z_n,
+                                        tx_pos, tx_freq, mat_perm)
+        # prepare data frame
+        data_frame = None
+        prepared_results = []
+        assert results is not None
+        for result in results:
+            prepared_result = {'x': result[0],
+                               'y': result[1],
+                               'z': result[2],
+                               'total_loss': result[3]}
+            prepared_results.append(prepared_result)
+        data_frame = pd.DataFrame(prepared_results)
+        return data_frame
+
     @staticmethod
     def result_to_lines(results, tx_pos, rx_pos):
         lines = []
@@ -75,7 +134,6 @@ class MurTracer:
         for result in results:
             if result[0] == 1:
                 loss_dB, delay = calculator.directLoss(tx_pos, rx_pos, tx_freq)
-
             elif result[0] == 2:
                 edges = list(map(list, result[1]))
                 loss_dB, delay = calculator.diffractLoss(

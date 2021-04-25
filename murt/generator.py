@@ -38,14 +38,16 @@ class SceneGenerator():
         ground = Object(self.ground_path)
         self.sceneComponents.append(ground)
         # Generate buildings
-        n_building = max(int(self.generator.normal(20, 5)), 2)
-        n_building = min(n_building, 35)
+        n_building = max(int(self.generator.normal(25, 10)), 2)
+        n_building = min(n_building, 40)
         cube_percentage = 0.5
         for i in range(n_building):
             type_build = self.generator.random()
             if type_build < cube_percentage:
                 building = self.generate_object(obj_path=self.cube_path,
-                                                h_min=7, h_max=25, w_min=7, w_max=30,
+                                                h_min=7, h_max=25, w_min=7,
+                                                w_max=max(
+                                                    self.generator.normal(20, 5), 15),
                                                 d_min=7, d_max=30)
             else:
                 building = self.generate_object(obj_path=self.house_path,

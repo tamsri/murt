@@ -6,11 +6,14 @@
 
 #include <vector>
 #include <unordered_map>
+#include <thread>
 
+#include "record.hpp"
 #include "vec3.hpp"
 #include "bvh.hpp"
 #include "triangle.hpp"
 #include "tracer.hpp"
+#include "calculator.hpp"
 
 typedef struct
 {
@@ -115,6 +118,74 @@ static PyObject *GetID(RayTracerObject *self, PyObject *Py_UNUSED(ignored))
     return Py_BuildValue("I", (self->tracer)->id_);
 }
 
+static PyObject *GetTracedVolume(RayTracerObject *self, PyObject *args)
+{
+    float x_min, x_max;
+    float y_min, y_max;
+    float z_min, z_max;
+    int x_n, y_n, z_n;
+    PyArrayObject *txPosObj;
+    float tx_freq, mat_perm;
+    if (!PyArg_ParseTuple(args, "f|f|i|f|f|i|f|f|i|O|f|f",
+                          &x_min, &x_max, &x_n,
+                          &y_min, &y_max, &y_n,
+                          &z_min, &z_max, &z_n,
+                          &txPosObj, &tx_freq, &mat_perm))
+        return NULL;
+
+    Vec3 txPos;
+    txPos.x_ = *(float *)PyArray_GETPTR1(txPosObj, 0);
+    txPos.y_ = *(float *)PyArray_GETPTR1(txPosObj, 1);
+    txPos.z_ = *(float *)PyArray_GETPTR1(txPosObj, 2);
+
+    Tracer *tracer = self->tracer;
+
+    float x_delta = (x_max - x_min) / (x_n - 1);
+    float y_delta = (y_max - y_min) / (y_n - 1);
+    float z_delta = (z_max - z_min) / (z_n - 1);
+
+    std::vector<std::thread> thread_vectors;
+    size_t max_thread = std::thread::hardware_concurrency() * 10;
+
+    for (int x_itr = 0; x_itr < x_n - 1; ++x_itr)
+        for (int y_itr = 0; y_itr < y_n - 1; ++y_itr)
+            for (int z_itr = 0; z_itr < z_n - 1; ++z_itr)
+            {
+                Vec3 rxPos;
+                rxPos.x_ = x_min + x_delta * x_itr;
+                rxPos.y_ = y_min + y_delta * y_itr;
+                rxPos.z_ = z_min + z_delta * z_itr;
+                std::thread current_thread(&Tracer::TraceAsync, tracer,
+                                           txPos, rxPos, tx_freq, mat_perm);
+                thread_vectors.push_back(std::move(current_thread));
+                if (thread_vectors.size() >= max_thread)
+                {
+                    for (std::thread &thread : thread_vectors)
+                        thread.join();
+                    thread_vectors.clear();
+                }
+            }
+
+    // join threads
+    for (std::thread &thread : thread_vectors)
+        thread.join();
+
+    thread_vectors.clear();
+
+    std::vector<std::vector<float> > &results = tracer->volume_result_;
+    PyObject *list_results = PyList_New(results.size());
+    for (size_t i = 0; i < results.size(); ++i)
+    {
+        std::vector<float> &result = results[i];
+        PyObject *list_result = Py_BuildValue("f f f f",
+                                              result[0], result[1],
+                                              result[2], result[3]);
+
+        PyList_SetItem(list_results, i, list_result);
+    }
+    return list_results;
+}
+
 static PyObject *RayTracerObjectNew(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
     RayTracerObject *self;
@@ -193,16 +264,13 @@ static PyMethodDef RayTracerMethods[] = {
     {"trace", (PyCFunction)Trace, METH_VARARGS, "Trace rays from tx to rx"},
     {"isOutdoor", (PyCFunction)IsOutdoor, METH_VARARGS, "Check if the input position is indoor"},
     {"hitNearest", (PyCFunction)HitNearest, METH_VARARGS, "Check the nearest hit distance"},
+    {"traceVolume", (PyCFunction)GetTracedVolume, METH_VARARGS, "Trace path loss volume"},
     {"getId", (PyCFunction)GetID, METH_NOARGS, "Return ID of Tracer"},
-    {NULL}
-    //{NULL, NULL, 0, NULL},
+    {NULL},
 };
 
 static PyMemberDef RayTracerMembers[] = {
-    //{(char *)"id", T_UINT, offsetof(RayTracerObject, id), 0, (char *)"Tracer's ID"},
-    {NULL}
-    //{NULL, NULL, 0, NULL},
-};
+    {NULL}};
 
 static PyTypeObject RayTracerType = {
     PyVarObject_HEAD_INIT(NULL, 0)    /* ob_size */
