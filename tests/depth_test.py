@@ -11,6 +11,7 @@ for i in range(3):
 
     depth_data = frame.pivot('x', 'z', 'depth')
     depth_map = depth_data.T
+    print(f"depth shape: {depth_map.shape}")
     plt.imshow(depth_map, cmap='inferno', interpolation='nearest')
     plt.colorbar()
     plt.axis('off')

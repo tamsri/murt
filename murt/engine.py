@@ -63,8 +63,9 @@ class MurTracer:
                 distance = self.hit_nearest(from_pos, to_pos)
                 # in case if there is no ground, skip
                 if distance < 0:
-                    continue
-                depth = upper_y-distance
+                    depth = 0.0
+                else:
+                    depth = upper_y-distance
                 data_row = {'x': current_x, 'z': current_z, 'depth': depth}
                 # print(distance)
                 data_depth.append(data_row)
