@@ -6,6 +6,12 @@
 #include <utility>
 #include <string>
 
+static bool AreFloatsSame(float a, float b)
+{
+    constexpr float EPSIL = 0.01f;
+    return fabs(a - b) < EPSIL;
+}
+
 class Vec3
 {
 public:
@@ -48,7 +54,10 @@ public:
     {
         return Vec3(x_ / f, y_ / f, z_ / f);
     };
-
+    bool operator==(const Vec3 &b) const
+    {
+        return (x_ == b.x_) && (y_ == b.y_) && (z_ == b.z_);
+    }
     Vec3 &operator+=(const Vec3 &o_v3)
     {
         x_ += o_v3.x_;
@@ -189,6 +198,14 @@ public:
     std::string GetString() const
     {
         return "(" + std::to_string(x_) + ", " + std::to_string(y_) + ", " + std::to_string(z_) + ")";
+    }
+};
+
+struct Vec3Hasher
+{
+    std::size_t operator()(const Vec3 &v) const
+    {
+        return ((std::hash<float>()(v.x_) ^ (std::hash<float>()(v.y_) << 1)) >> 1) ^ (std::hash<float>()(v.z_) << 1);
     }
 };
 #endif //VEC3_H

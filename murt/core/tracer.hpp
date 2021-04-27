@@ -4,6 +4,7 @@
 #include <mutex>
 #include <vector>
 #include <math.h>
+#include <unordered_map>
 
 #include "record.hpp"
 #include "vec3.hpp"
@@ -11,7 +12,6 @@
 #include "bvh.hpp"
 
 #include "calculator.hpp"
-
 
 class Tracer
 {
@@ -260,14 +260,14 @@ public:
         else
         {
             std::vector<Record> records = this->Trace(txPos, rxPos);
+
             if (records.empty())
             {
                 result.push_back(-1.0f);
             }
             else
             {
-                float total_path_loss = GetTotalPathLoss(txPos, rxPos, txFreq, matPerm, records);
-                result.push_back(total_path_loss);
+                result.push_back(GetTotalPathLoss(txPos, rxPos, txFreq, matPerm, records));
             }
         }
 
@@ -276,7 +276,6 @@ public:
         mutex_.unlock();
     }
 };
-
 unsigned int Tracer::global_id = 0;
 
 #endif //!TRACER_H

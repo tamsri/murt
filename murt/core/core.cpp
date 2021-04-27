@@ -145,7 +145,7 @@ static PyObject *GetTracedVolume(RayTracerObject *self, PyObject *args)
     float z_delta = (z_max - z_min) / (z_n - 1);
 
     std::vector<std::thread> thread_vectors;
-    size_t max_thread = std::thread::hardware_concurrency() * 10;
+    size_t max_thread = std::thread::hardware_concurrency() * 5;
 
     for (int x_itr = 0; x_itr < x_n - 1; ++x_itr)
         for (int y_itr = 0; y_itr < y_n - 1; ++y_itr)
@@ -158,6 +158,7 @@ static PyObject *GetTracedVolume(RayTracerObject *self, PyObject *args)
                 std::thread current_thread(&Tracer::TraceAsync, tracer,
                                            txPos, rxPos, tx_freq, mat_perm);
                 thread_vectors.push_back(std::move(current_thread));
+
                 if (thread_vectors.size() >= max_thread)
                 {
                     for (std::thread &thread : thread_vectors)
@@ -169,7 +170,6 @@ static PyObject *GetTracedVolume(RayTracerObject *self, PyObject *args)
     // join threads
     for (std::thread &thread : thread_vectors)
         thread.join();
-
     thread_vectors.clear();
 
     std::vector<std::vector<float> > &results = tracer->volume_result_;
@@ -183,6 +183,8 @@ static PyObject *GetTracedVolume(RayTracerObject *self, PyObject *args)
 
         PyList_SetItem(list_results, i, list_result);
     }
+    //clean the resullts
+    results.clear();
     return list_results;
 }
 
@@ -202,13 +204,10 @@ static PyObject *RayTracerObjectNew(PyTypeObject *type, PyObject *args, PyObject
         size_t vert_dim_m = verticesArray->dimensions[1];
         size_t tri_dim_n = trianglesArray->dimensions[0];
         size_t tri_dim_m = trianglesArray->dimensions[1];
-        //printf("vert: n=%lu, m=%lu\n", vert_dim_n, vert_dim_m);
-        //printf("tria: n=%lu, m=%lu\n", tri_dim_n, tri_dim_m);
         if (vert_dim_m != 3 || tri_dim_m != 3)
-            return NULL; // invalid input TODO[?]: maybe, bug it later.
+            return NULL;
 
         std::unordered_map<size_t, Vec3> vertices_dict;
-        // prepare vertices dictionary.
         for (size_t i = 0; i < vert_dim_n; ++i)
         {
             double x = *(double *)PyArray_GETPTR2(verticesArray, i, 0);
