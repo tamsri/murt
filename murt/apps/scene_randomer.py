@@ -25,7 +25,7 @@ class RandomRunner(MurtWindow):
         vertices, indice = scene_gen.get_triangles()
         self.tracer.load_scene(vertices, indice)
         self.lines_set = []
-        for i in range(200):
+        for i in range(1):
             tx = (0.0, -3.0, 0.0)
             rx = (0.0, -3.0, 0.0)
             while self.tracer.is_outdoor(tx) is not True:

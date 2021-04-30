@@ -17,19 +17,9 @@ while my_tracer.is_outdoor(txPos) is not True:
              np.random.random()*200-100]
 
 start = time.time()
-data_frame_1 = my_tracer.get_traced_volume(x_min=-150, x_max=150, x_n=250,
+data_frame_1 = my_tracer.get_traced_volume(x_min=-150, x_max=150, x_n=25,
                                            y_min=1, y_max=5, y_n=10,
-                                           z_min=-150, z_max=150, z_n=250,
+                                           z_min=-150, z_max=150, z_n=25,
                                            tx_pos=txPos, tx_freq=2.4e9, mat_perm=5.3)
 end = time.time()
-print(f"The first multithread tracing engine takes {end-start} seconds")
-
-
-# trace with different frequency (should speed up)
-start = time.time()
-data_frame_2 = my_tracer.get_traced_volume(x_min=-150, x_max=150, x_n=250,
-                                           y_min=1, y_max=5, y_n=10,
-                                           z_min=-150, z_max=150, z_n=250,
-                                           tx_pos=txPos, tx_freq=4.7e9, mat_perm=5.3)
-end = time.time()
-print(f"The multithread tracing engine takes {end-start} seconds")
+print(f"The multithread tracing engine takes {end-start:.2f} seconds")
