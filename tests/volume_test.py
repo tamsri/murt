@@ -1,13 +1,14 @@
-from murt import tracer, scene_generator
+from murt import Tracer
+from murt.utils.generator import SceneGenerator
 import numpy as np
 import time
 import plotly.graph_objects as go
 
 SEED = 100
-my_scene = scene_generator(SEED)
+my_scene = SceneGenerator(SEED)
 my_scene.generate()
 
-my_tracer = tracer()
+my_tracer = Tracer()
 my_tracer.load_scene(*my_scene.get_triangles())
 
 txPos = [0, -1, 0]

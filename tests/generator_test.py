@@ -1,7 +1,8 @@
-from murt import scene_generator, mwindow
+from murt.window import Window
+from murt.utils.generator import SceneGenerator
 
-a = scene_generator(888)
+a = SceneGenerator(888)
 a.generate()
-window = mwindow()
+window = Window()
 window.scene = a.sceneComponents
 window.run()

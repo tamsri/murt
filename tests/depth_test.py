@@ -1,11 +1,13 @@
-from murt import scene_generator, mwindow, tracer
+from murt import Tracer
 from matplotlib import pyplot as plt
+from murt.utils.generator import SceneGenerator
+from murt.window import Window
 
 RANDOM_SEED = 9999
-my_scene = scene_generator(RANDOM_SEED)
+my_scene = SceneGenerator(RANDOM_SEED)
 
 my_scene.generate()
-my_tracer = tracer()
+my_tracer = Tracer()
 my_tracer.load_scene(*my_scene.get_triangles())
 frame = my_scene.get_depth_map(-100, 100, 500, -100, 100, 500)
 
@@ -17,6 +19,6 @@ plt.colorbar()
 plt.axis('off')
 plt.show()
 
-my_window = mwindow()
+my_window = Window()
 my_window.scene = my_scene.get_scene()
 my_window.run()

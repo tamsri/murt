@@ -1,6 +1,6 @@
 # MURT
 
-Multipath Radio Tracer (MURT) is a ray-tracing engine for multipath propagation of radio wave. MURT is a Python package with the ray-tracing core engine implemented in Python C++ Extension. The pacakge also includes utility tools such as the visualizer, path loss calculator, and the scene generator.
+Multipath Radio Tracer (MURT) is a ray-tracing engine for multipath propagation of radio waves. MURT is a Python package with the ray-tracing core engine implemented in Python C++ Extension. The package also includes utility tools such as the visualizer, path loss calculator, and the scene generator.
 
 ---
 
@@ -22,18 +22,20 @@ make all
 
 ---
 
-## Get Started
+## Examples
 
-The core engine only accepts the triangulated obj files to the tracing process.
+### 1. Call tracing engine.
+
+The core engine reads the triangulated obj files and process the triangles into the engine.
 
 ```Python
-from murt import tracer
+from murt import Tracer
 
 # Scene File Path in obj
-SCENE_FILE_PATH =  "scene_file_path.obj"
+SCENE_FILE_PATH = "scene_file_path.obj"
 
 # Initialize Tracer
-my_tracer = tracer(SCENE_FILE_PATH)
+my_tracer = Tracer(SCENE_FILE_PATH)
 # Set transmitting position
 tx_pos = [ 0, 15, 0]
 # Set receiving position
@@ -41,64 +43,67 @@ rx_pos = [-30, 1.5, 45]
 
 # Return the traced paths
 result = my_tracer.trace(tx_pos, rx_pos)
-# [(2, [(-19.24, 8.56, 28.86)]), (3, (-28.94, 4.22, 62.39)), (3, (-70.80, 7.04, 15.22))]
+# [(2, [(-19.24, 8.56, 28.86)]),
+#  (3, (-28.94, 4.22, 62.39)),
+#  (3, (-70.80, 7.04, 15.22))]
 ```
 
-The result is the list of traced paths. The first position of the tuple indicates types of the paths (1 - direct path, 2 - diffracted path, 3 - reflected path). Tbe second position of the tuple is the detail of the traced paths.
+The result is the list of traced paths. The first position of the tuple indicates types of the paths (1 - direct path, 2 - diffracted path, 3 - reflected path). The second position of the tuple is the detail of the traced paths.
 
-### Calculate Path Loss
+### 2. Calculate Path Loss.
 
 As the possible paths are traced from the engine. the results from the tracer can be used to
 
 ```Python
 tx_freq = 2.4e9 # 2.4 GHz
 
-scene_permittivity = 5.3  # Concrete's
+scene_permittivity = 5.3 # Concrete's
 
 result = [(2, [(-19.24, 8.56, 28.86)]),
-          (3, (-28.94, 4.22, 62.39)),
-          (3, (-70.80, 7.04, 15.22))]
+ (3, (-28.94, 4.22, 62.39)),
+ (3, (-70.80, 7.04, 15.22))]
 
-losses = my_tracer.TotalPathLoss(
-    tx_pos, rx_pos, result, tx_freq, scene_permittivity)
+losses = my_tracer.get_total_loss(
+ tx_pos, rx_pos, result, tx_freq, scene_permittivity)
 # {'total_dB': 84.3, 'signals': [[95.50, 1.86e-07], [86.63, 2.91e-07], [89.27, 4.12e-07]]}
 ```
 
 The tracer calculates the total path loss according to the theoretical propagation models. In this example, the scene material is considered to be concrete.
 
-### Visualization
+### 3. Visualizing traced paths.
 
-To visualise the traced path, MURT package provides a window to display the scene and the paths by filling the information of the paths into the window's lines_set.
+To visualize the traced path, MURT package provides a window to display the scene and the paths by filling the information of the paths into the window's lines_set.
 
 ```Python
-from murt import mwindow, tracer
-SCENE_FILE_PATH =  "scene_file_path.obj"
+from murt import Tracer
+from murt.window import Window
+SCENE_FILE_PATH = "scene_file_path.obj"
 
 # load window and scene
-my_window = mwindow()
+my_window = Window()
 my_window.load_scene(SCENE_FILE_PATH)
 
 # result from the previous example.
 tx_pos = [ 0, 15, 0]
 rx_pos = [-30, 1.5, 45]
 result = [(2, [(-19.24, 8.56, 28.86)]),
-          (3, (-28.94, 4.22, 62.39)),
-          (3, (-70.80, 7.04, 15.22))]
+ (3, (-28.94, 4.22, 62.39)),
+ (3, (-70.80, 7.04, 15.22))]
 
 # convert results to visualised paths
-my_window.lines_set += tracer.result_to_lines(result, tx_pos, rx_pos)
+my_window.lines_set += Tracer.result_to_lines(result, tx_pos, rx_pos)
 
 # run
 my_window.run()
 ```
 
-The scene can be rotate by click and drag. the result can be shown below.
+The scene can be rotated by click and drag. the result can be shown below.
 
-![Example Image](https://github.com/tamsri/murt/blob/master/assets/img/ex1.png)
+![Example Image](https://github.com/tamsri/murt/blob/master/assets/img/ex1.gif)
 
-#### Procedurally Generated Scene
+### 3. Randomly Generate the Scene
 
-MURT also provides procedurally generated scenes for testing the multipath propagation. The application can be directly called from murt.apps.
+MURT also provides an example of application to procedurally generate the scenes for testing the traced paths from the engine. The application can be directly called from murt.apps.
 
 ```Python
 from murt.apps import randomer
@@ -108,9 +113,12 @@ a = randomer(RANDOM_SEED)
 a.run()
 ```
 
-![Example Image](https://github.com/tamsri/murt/blob/master/assets/img/ex2.png)
-The scene can be regenerated by pressed G button.
+The scene can be regenerated by pressing the G button.
+
+![Example Image](https://github.com/tamsri/murt/blob/master/assets/img/ex2.gif)
 
 ---
+
 ## License
-© Supawat Tamsri 
+
+© Supawat Tamsri [MIT](https://github.com/tamsri/murt/blob/master/LICENSE)

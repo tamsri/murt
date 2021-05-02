@@ -1,14 +1,15 @@
-from murt.window import MurtWindow
-from murt import tracer, scene_generator
+from murt.window import Window
+from murt import Tracer
+from murt.utils.generator import SceneGenerator
 from pyglet.window import key
 from pyglet import text
 import numpy as np
 
 
-class RandomRunner(MurtWindow):
+class RandomRunner(Window):
     def __init__(self, seed=9999):
         super().__init__()
-        self.tracer = tracer()
+        self.tracer = Tracer()
         self.generator = np.random.default_rng(seed)
         self.regenerate_scene()
 
@@ -19,7 +20,7 @@ class RandomRunner(MurtWindow):
         super().on_key_release(pressed_key, modifier)
 
     def regenerate_scene(self):
-        scene_gen = scene_generator(self.generator.integers(0, 1000000))
+        scene_gen = SceneGenerator(self.generator.integers(0, 1000000))
         scene_gen.generate()
         self.scene = scene_gen.sceneComponents
         vertices, indice = scene_gen.get_triangles()

@@ -1,6 +1,5 @@
-from murt import tracer
-from murt.utils import objreader
-from murt.window import MurtWindow
+from murt import Tracer
+from murt.window import Window
 
 from time import sleep
 from time import time
@@ -9,8 +8,8 @@ import numpy as np
 
 def TracerTest():
     print("------------ Tracer Test -------------")
-    a = tracer("./assets/poznan.obj")
-    window = MurtWindow()
+    a = Tracer("./assets/poznan.obj")
+    window = Window()
     window.load_scene('./assets/display_poznan.obj')
     # a.trace([1, 2, 1], [2, 3, 4])
 

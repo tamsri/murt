@@ -23,7 +23,7 @@ def install():
                                   extra_compile_args=['-std=c++17'])
     setup(
         name="murt",
-        version="0.0.2",
+        version="0.0.3",
         author="Supawat Tamsri",
         author_email="contact@supawat.dev",
         description="Python Library for Multipath Ray Tracing",
@@ -31,7 +31,8 @@ def install():
         long_description_content_type="text/markdown",
         license="MIT",
         keywords=['Telecommunications', 'Radio', 'Ray Tracing', 'Simulation'],
-        packages=['murt', 'murt.utils', 'murt.apps'],
+        packages=['murt', 'murt.utils', 'murt.apps',
+                  'murt.engine', 'murt.window'],
         install_requires=['numpy', 'pyglet', 'pywavefront'],
         ext_modules=[core_module, calculator_module],
         data_files=data_files,

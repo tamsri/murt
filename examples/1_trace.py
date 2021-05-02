@@ -1,10 +1,10 @@
-from murt import tracer
+from murt import Tracer
 
 # Scene File Path in obj
 OBJ_FILE_PATH = "./assets/poznan.obj"
 
 # Initialize Tracer
-my_tracer = tracer(OBJ_FILE_PATH)
+my_tracer = Tracer(OBJ_FILE_PATH)
 # Set transmiting position
 tx_pos = [0, 15, 0]
 # Set receiving position
