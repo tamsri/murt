@@ -1,4 +1,4 @@
-from murt import Tracer
+from murt.engine import Tracer
 from murt.window import Window
 
 from time import sleep

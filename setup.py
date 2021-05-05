@@ -1,4 +1,4 @@
-from setuptools import setup, Extension, find_packages
+from setuptools import setup, Extension
 import numpy as np
 import os
 
@@ -16,15 +16,18 @@ def install():
     core_module = Extension('murt.core',
                             sources=['murt/core/core.cpp'],
                             include_dirs=[np.get_include()],
+                            language='c++',
                             extra_compile_args=['-std=c++17'])
 
     calculator_module = Extension('murt.calculator',
                                   sources=['murt/core/calculator.cpp'],
+                                  language='c++',
                                   extra_compile_args=['-std=c++17'])
     setup(
         name="murt",
-        version="0.0.3",
+        version="0.0.4",
         author="Supawat Tamsri",
+        python_requires='>=3.8.8',
         author_email="contact@supawat.dev",
         description="Python Library for Multipath Ray Tracing",
         long_description=open('README.md').read(),
@@ -33,7 +36,7 @@ def install():
         keywords=['Telecommunications', 'Radio', 'Ray Tracing', 'Simulation'],
         packages=['murt', 'murt.utils', 'murt.apps',
                   'murt.engine', 'murt.window'],
-        install_requires=['numpy', 'pyglet', 'pywavefront'],
+        install_requires=['wheel', 'numpy>=1.20.2', 'pyglet', 'pywavefront'],
         ext_modules=[core_module, calculator_module],
         data_files=data_files,
         include_package_data=True

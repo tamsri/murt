@@ -6,7 +6,7 @@ Multipath Radio Tracer (MURT) is a ray-tracing engine for multipath propagation 
 
 ## Installations
 
-MURT can be installed by pip.
+MURT can be installed by pip, however, `numpy` is required before the installation.
 
 ```shell
 pip install murt
