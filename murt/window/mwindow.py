@@ -5,7 +5,7 @@ from pyglet.window import Window, key
 from pyglet.gl import *
 from pywavefront import visualization, Wavefront
 
-from . import Object
+from murt.utils.object import Object
 
 
 class MurtWindow(Window):

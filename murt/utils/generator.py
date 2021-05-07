@@ -4,7 +4,7 @@ import sys
 import os
 import logging
 
-from murt.window import Object
+from murt.utils.object import Object
 from murt import Tracer
 
 COMPONENT_PATH = os.path.join(sys.prefix, "murt-assets")
