@@ -27,7 +27,7 @@ def install():
         name="murt",
         version="0.0.4",
         author="Supawat Tamsri",
-        python_requires='>=3.8.8',
+        python_requires='>=3.7.10',
         author_email="contact@supawat.dev",
         description="Python Library for Multipath Ray Tracing",
         long_description=open('README.md').read(),

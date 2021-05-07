@@ -252,10 +252,10 @@ static void RayTracerObjectDealloc(RayTracerObject *self)
     Py_TYPE(self)->tp_free((PyObject *)self);
 }
 
-static int RayTracerObjectInit(RayTracerObject *self, PyObject *args, PyObject *kwds)
-{
-    return 0;
-}
+// static int RayTracerObjectInit(RayTracerObject *self, PyObject *args, PyObject *kwds)
+// {
+//     return 0;
+// }
 /*----------------------------------------------------------------*/
 
 /*Define methods*/
@@ -272,17 +272,43 @@ static PyMemberDef RayTracerMembers[] = {
     {NULL}};
 
 static PyTypeObject RayTracerType = {
-    PyVarObject_HEAD_INIT(NULL, 0)    /* ob_size */
-        .tp_name = "murtcore.Tracer", /*tp_name*/
-    .tp_doc = "Ray Tracer Objects",
-    .tp_basicsize = sizeof(RayTracerObject),          /*tp_basicsize*/
-    .tp_dealloc = (destructor)RayTracerObjectDealloc, /*tp_dealloc*/
-    .tp_flags = Py_TPFLAGS_DEFAULT,
-    .tp_clear = (inquiry)RayTracerObjectClear,
-    .tp_methods = RayTracerMethods,
-    .tp_members = RayTracerMembers,
-    .tp_init = 0, //(initproc)RayTracerObjectInit,
-    .tp_new = RayTracerObjectNew,
+    PyVarObject_HEAD_INIT(NULL, 0) "murtcore.Tracer", /* tp_name */
+    sizeof(RayTracerObject),                          /* tp_basicsize */
+    0,                                                /* tp_itemsize */
+    (destructor)RayTracerObjectDealloc,               /* tp_dealloc */
+    0,                                                /* tp_vectorcall_offset */
+    0,                                                /* tp_getattr */
+    0,                                                /* tp_setattr */
+    0,                                                /* tp_as_async */
+    0,                                                /* tp_repr */
+    0,                                                /* tp_as_number */
+    0,                                                /* tp_as_sequence */
+    0,                                                /* tp_as_mapping */
+    0,                                                /* tp_hash */
+    0,                                                /* tp_call */
+    0,                                                /* tp_str */
+    0,                                                /* tp_getattro */
+    0,                                                /* tp_setattro */
+    0,                                                /* tp_as_buffer */
+    Py_TPFLAGS_DEFAULT,                               /* tp_flags */
+    "Ray Tracer Objects",                             /* tp_doc */
+    0,                                                /* tp_traverse */
+    (inquiry)RayTracerObjectClear,                    /* tp_clear */
+    0,                                                /* tp_richcompare */
+    0,                                                /* tp_weaklistoffset */
+    0,                                                /* tp_iter */
+    0,                                                /* tp_iternext */
+    RayTracerMethods,                                 /* tp_methods */
+    RayTracerMembers,                                 /* tp_members */
+    0,                                                /* tp_getset */
+    0,                                                /* tp_base */
+    0,                                                /* tp_dict */
+    0,                                                /* tp_descr_get */
+    0,                                                /* tp_descr_set */
+    0,                                                /* tp_dictoffset */
+    0,                                                /* tp_init */
+    0,                                                /* tp_alloc */
+    RayTracerObjectNew,                               /* tp_new */
 };
 
 static PyModuleDef murtcore_module = {
