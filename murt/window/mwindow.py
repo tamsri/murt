@@ -116,7 +116,19 @@ class MurtWindow(Window):
         # Draw Scene
         glEnable(GL_DEPTH_TEST)
         for scene in self.scene:
-            scene.draw()
+            glPushMatrix()
+            # Rotation
+            # glRotatef(scene.rotate[0], 1.0, 0.0, 0.0) #unused
+            # glRotatef(scene.rotate[2], 0.0, 0.0, 1.0) #unused
+            # Translation
+            glTranslatef(*scene.translate)
+            glRotatef(scene.rotate[1], 0.0, 1.0, 0.0)
+            # Scale
+            glScalef(*scene.scale)
+            # Visualise
+            visualization.draw(scene.object)
+            glPopMatrix()
+
         # Draw Lines
         for lines in self.lines_set:
             self.draw_lines(lines)

@@ -1,6 +1,5 @@
 import numpy as np
 from murt.utils import objreader
-from pyglet.gl import *
 from pywavefront import Wavefront, visualization
 
 
@@ -23,21 +22,21 @@ class Object():
     def rotate_obj(self, x, y, z):
         self.rotate = (float(x), float(y), float(z))
 
-    def draw(self):
-        glPushMatrix()
-        # Rotation
-        # glRotatef(self.rotate[0], 1.0, 0.0, 0.0) #unused
-        # glRotatef(self.rotate[2], 0.0, 0.0, 1.0) #unused
-        #glTranslatef(0, 0, 0)
+    # def draw(self):
+    #     glPushMatrix()
+    #     # Rotation
+    #     # glRotatef(self.rotate[0], 1.0, 0.0, 0.0) #unused
+    #     # glRotatef(self.rotate[2], 0.0, 0.0, 1.0) #unused
+    #     #glTranslatef(0, 0, 0)
 
-        # Translation
-        glTranslatef(*self.translate)
-        glRotatef(self.rotate[1], 0.0, 1.0, 0.0)
+    #     # Translation
+    #     glTranslatef(*self.translate)
+    #     glRotatef(self.rotate[1], 0.0, 1.0, 0.0)
 
-        # Scale
-        glScalef(*self.scale)
+    #     # Scale
+    #     glScalef(*self.scale)
 
-        # Visualise
-        visualization.draw(self.object)
+    #     # Visualise
+    #     visualization.draw(self.object)
 
-        glPopMatrix()
+    #     glPopMatrix()
