@@ -5,7 +5,7 @@ clean:
 	pip uninstall murt -y
 all:
 	python setup.py install
-	#pip install .
+	pip install .
 test:
 	python ./tests/core_tests.py
 	python ./tests/tracer_test.py
@@ -20,3 +20,7 @@ tai:
 dev:
 	make clean
 	make tai
+pub:
+	python setup.py sdist
+	python setup.py bdist_wheel
+	twine upload ./dist/*

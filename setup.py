@@ -25,7 +25,7 @@ def install():
                                   extra_compile_args=['-std=c++17'])
     setup(
         name="murt",
-        version="0.0.4",
+        version="0.0.5",
         author="Supawat Tamsri",
         python_requires='>=3.7.10',
         author_email="contact@supawat.dev",

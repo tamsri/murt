@@ -3,17 +3,11 @@ import pandas as pd
 import sys
 import os
 import logging
-import pywavefront
 
 from murt.window import Object
 from murt import Tracer
 
 COMPONENT_PATH = os.path.join(sys.prefix, "murt-assets")
-
-pywavefront.configure_logging(
-    logging.ERROR,
-    formatter=logging.Formatter('%(name)s-%(levelname)s: %(message)s')
-)
 
 
 class SceneGenerator():
