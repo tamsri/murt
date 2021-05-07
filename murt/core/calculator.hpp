@@ -5,7 +5,7 @@
 #include <utility>
 #include <math.h>
 #include <vector>
-
+#include <algorithm>
 
 #include "vec3.hpp"
 #include "record.hpp"
@@ -20,7 +20,7 @@ static float GetDelay(std::vector<Vec3> points, float speed)
     {
         total_distance += Vec3::Distance(points[i], points[i + 1]);
     }
-    return total_distance / speed;
+    return float(total_distance / speed);
 }
 
 static float DirectPathLoss(Vec3 txPos, Vec3 rxPos, float txFreq)
@@ -51,9 +51,9 @@ static float GetRefCoe(Vec3 txPos, Vec3 rxPos, Vec3 refPos, float matPerm, bool 
         return 1.0f;
 
     float coe = (isTM) ? (sqrt(n2) * cos(angle_1) - sqrt(n1) * cos(angle_2)) /
-                       (sqrt(n2) * cos(angle_1) + sqrt(n1) * cos(angle_2))
-                 : (sqrt(n1) * cos(angle_1) - sqrt(n2) * cos(angle_2)) /
-                       (sqrt(n1) * cos(angle_1) + sqrt(n2) * cos(angle_2));
+                             (sqrt(n2) * cos(angle_1) + sqrt(n1) * cos(angle_2))
+                       : (sqrt(n1) * cos(angle_1) - sqrt(n2) * cos(angle_2)) /
+                             (sqrt(n1) * cos(angle_1) + sqrt(n2) * cos(angle_2));
     return coe;
 }
 
@@ -192,7 +192,7 @@ static float DiffractedPathLoss(Vec3 txPos, Vec3 rxPos, std::vector<Vec3> edges,
 
 static float GetTotalPathLoss(Vec3 txPos, Vec3 rxPos,
                               float txFreq, float matPerm,
-                              std::vector<Record> & records)
+                              std::vector<Record> &records)
 {
     float total_loss_linear = 0.0f;
     for (Record &record : records)
@@ -214,6 +214,6 @@ static float GetTotalPathLoss(Vec3 txPos, Vec3 rxPos,
         total_loss_linear += pow(10.0f, -loss_dB / 10.0f);
     }
     // return the total loss in linear
-    return -10 * log10(total_loss_linear);
+    return (float)(-10 * log10(total_loss_linear));
 }
 #endif

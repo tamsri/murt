@@ -188,8 +188,9 @@ public:
         size_t half_size = ordered_triangles.size() / 2;
         size_t current_pos = 0;
         //printf("Ordered triangles: ");
-        for (auto &[key, triangle] : ordered_triangles)
+        for (auto &ordered_triangle : ordered_triangles)
         {
+            Triangle *triangle = ordered_triangle.second;
             //printf("%.3f ", key);
             if (current_pos < half_size)
                 left_members.push_back(triangle);

@@ -6,12 +6,6 @@
 #include <utility>
 #include <string>
 
-static bool AreFloatsSame(float a, float b)
-{
-    constexpr float EPSIL = 0.01f;
-    return fabs(a - b) < EPSIL;
-}
-
 class Vec3
 {
 public:
@@ -190,8 +184,8 @@ public:
         }
 
         std::vector<Vec3> new_edges;
-        for (auto &[distance, edge] : ordered_edges)
-            new_edges.push_back(edge);
+        for (std::pair<float, Vec3> pair_edge : ordered_edges)
+            new_edges.push_back(pair_edge.second);
         edges = new_edges;
         ordered_edges.clear();
     }
