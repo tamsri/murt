@@ -6,9 +6,9 @@ from murt import Tracer
 
 
 class SceneGenerator():
-    def __init__(self, seed=0):
+    def __init__(self, seed=0, component_path=None):
         self.sceneComponents = []
-
+        self.component_path = component_path
         self.x_min = -140
         self.x_max = 140
         self.z_min = -140
@@ -22,7 +22,7 @@ class SceneGenerator():
         self.globalIndice = None
         self.sceneComponents = []
         # Generate ground
-        ground = Object('ground')
+        ground = Object('ground', directory_path=self.component_path)
         self.sceneComponents.append(ground)
         # Generate buildings
         n_building = max(int(self.generator.normal(25, 10)), 2)
@@ -51,7 +51,7 @@ class SceneGenerator():
         if obj_name is None:
             obj_name = 'cube'
 
-        building = Object(obj_name)
+        building = Object(obj_name, directory_path=self.component_path)
 
         # Generate Scale
         x_scale = self.generator.uniform(w_min,
