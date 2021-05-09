@@ -1,6 +1,5 @@
 import numpy as np
 from murt.utils import objreader
-from pywavefront import Wavefront, visualization
 import os
 import sys
 COMPONENT_PATH = os.path.join(sys.prefix, "murt-assets")
