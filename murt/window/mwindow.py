@@ -1,11 +1,26 @@
 import numpy as np
-
+import os
+import sys
 import pyglet
+import logging
 from pyglet.window import Window, key
 from pyglet.gl import *
-from pywavefront import visualization, Wavefront
+from pywavefront import visualization, Wavefront, configure_logging
 
 from murt.utils.object import Object
+
+configure_logging(
+    logging.ERROR,
+    formatter=logging.Formatter('%(name)s-%(levelname)s: %(message)s')
+)
+
+COMPONENT_PATH = os.path.join(sys.prefix, "murt-assets")
+
+display_objects = {
+    'ground': Wavefront(os.path.join(COMPONENT_PATH, "ground.obj"), collect_faces=True),
+    'house': Wavefront(os.path.join(COMPONENT_PATH, "house.obj"), collect_faces=True),
+    'cube': Wavefront(os.path.join(COMPONENT_PATH, "cube.obj"), collect_faces=True)
+}
 
 
 class MurtWindow(Window):
@@ -24,8 +39,12 @@ class MurtWindow(Window):
         self.alive = True
         self.zoom = 66
 
-    def load_scene(self, file_path):
-        self.scene.append(Object(file_path))
+    def load_scene(self, name, file_path):
+        try:
+            display_objects[name]
+        except:
+            display_objects[name] = Wavefront(file_path, collect_faces=True)
+        self.scene.append(Object(name, file_path=file_path))
 
     def on_resize(self, width, height):
         self.win_size = [width, height]
@@ -126,7 +145,10 @@ class MurtWindow(Window):
             # Scale
             glScalef(*scene.scale)
             # Visualise
-            visualization.draw(scene.object)
+            try:
+                visualization.draw(display_objects[scene.object_name])
+            except:
+                pass  # maybe implement later.
             glPopMatrix()
 
         # Draw Lines

@@ -83,7 +83,7 @@ SCENE_FILE_PATH = "scene_file_path.obj"
 
 # load window and scene
 my_window = Window()
-my_window.load_scene(SCENE_FILE_PATH)
+my_window.load_scene(name="scene_name", file_path = SCENE_FILE_PATH)
 
 # result from the previous example.
 tx_pos = [ 0, 15, 0]

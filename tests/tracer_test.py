@@ -10,7 +10,7 @@ def TracerTest():
     print("------------ Tracer Test -------------")
     a = Tracer("./assets/poznan.obj")
     window = Window()
-    window.load_scene('./assets/display_poznan.obj')
+    window.load_scene(name='poznan', file_path="./assets/poznan.obj")
     # a.trace([1, 2, 1], [2, 3, 4])
 
     avg_time = 0

@@ -1,20 +1,12 @@
 import numpy as np
 import pandas as pd
-import sys
-import os
-import logging
 
 from murt.utils.object import Object
 from murt import Tracer
 
-COMPONENT_PATH = os.path.join(sys.prefix, "murt-assets")
-
 
 class SceneGenerator():
     def __init__(self, seed=0):
-        self.cube_path = os.path.join(COMPONENT_PATH, "cube.obj")
-        self.house_path = os.path.join(COMPONENT_PATH, "house.obj")
-        self.ground_path = os.path.join(COMPONENT_PATH, "ground.obj")
         self.sceneComponents = []
 
         self.x_min = -140
@@ -30,7 +22,7 @@ class SceneGenerator():
         self.globalIndice = None
         self.sceneComponents = []
         # Generate ground
-        ground = Object(self.ground_path)
+        ground = Object('ground')
         self.sceneComponents.append(ground)
         # Generate buildings
         n_building = max(int(self.generator.normal(25, 10)), 2)
@@ -39,13 +31,13 @@ class SceneGenerator():
         for i in range(n_building):
             type_build = self.generator.random()
             if type_build < cube_percentage:
-                building = self.generate_object(obj_path=self.cube_path,
+                building = self.generate_object(obj_name="cube",
                                                 h_min=7, h_max=25, w_min=7,
                                                 w_max=max(
                                                     self.generator.normal(20, 5), 15),
                                                 d_min=7, d_max=30)
             else:
-                building = self.generate_object(obj_path=self.house_path,
+                building = self.generate_object(obj_name="house",
                                                 h_min=5, h_max=20, w_min=7, w_max=15,
                                                 d_min=7, d_max=20)
             self.sceneComponents.append(building)
@@ -53,13 +45,13 @@ class SceneGenerator():
         self.prepare_triangles()
         return
 
-    def generate_object(self, obj_path=None, h_min=5,
+    def generate_object(self, obj_name=None, h_min=5,
                         h_max=30, w_min=7, w_max=30,
                         d_min=6, d_max=30):
-        if obj_path is None:
-            obj_path = self.cube_path
+        if obj_name is None:
+            obj_name = 'cube'
 
-        building = Object(obj_path)
+        building = Object(obj_name)
 
         # Generate Scale
         x_scale = self.generator.uniform(w_min,

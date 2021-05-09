@@ -4,7 +4,7 @@ SCENE_PATH = "./assets/poznan.obj"
 
 # load window and scene
 my_window = Window()
-my_window.load_scene(SCENE_PATH)
+my_window.load_scene(name='poznan', file_path=SCENE_PATH)
 
 # trace
 tx_pos = [0, 15, 0]
