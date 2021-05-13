@@ -79,7 +79,7 @@ class tracer:
                           x_min, x_max, x_n,
                           y_min, y_max, y_n,
                           z_min, z_max, z_n,
-                          tx_pos, tx_freq, mat_perm):
+                          tx_pos, tx_freq, mat_perm, max_thread=0):
         # check input
         assert x_min < x_max and x_n > 0
         assert y_min < y_max and y_n > 0
@@ -89,11 +89,13 @@ class tracer:
         tx_pos = tx_pos.astype('float32')
         tx_freq = float(tx_freq)
         mat_perm = float(mat_perm)
+        max_thread = int(max_thread)
         # trace
         results = self.core.traceVolume(x_min, x_max, x_n,
                                         y_min, y_max, y_n,
                                         z_min, z_max, z_n,
-                                        tx_pos, tx_freq, mat_perm)
+                                        tx_pos, tx_freq, mat_perm,
+                                        max_thread)
         # prepare data frame
         data_frame = None
         prepared_results = []

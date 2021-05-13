@@ -126,11 +126,13 @@ static PyObject *GetTracedVolume(RayTracerObject *self, PyObject *args)
     int x_n, y_n, z_n;
     PyArrayObject *txPosObj;
     float tx_freq, mat_perm;
-    if (!PyArg_ParseTuple(args, "f|f|i|f|f|i|f|f|i|O|f|f",
+    int max_thread = 0;
+    if (!PyArg_ParseTuple(args, "f|f|i|f|f|i|f|f|i|O|f|f|i",
                           &x_min, &x_max, &x_n,
                           &y_min, &y_max, &y_n,
                           &z_min, &z_max, &z_n,
-                          &txPosObj, &tx_freq, &mat_perm))
+                          &txPosObj, &tx_freq, &mat_perm,
+                          &max_thread))
         return NULL;
 
     Vec3 txPos;
@@ -145,7 +147,20 @@ static PyObject *GetTracedVolume(RayTracerObject *self, PyObject *args)
     float z_delta = (z_max - z_min) / (z_n - 1);
 
     std::vector<std::thread> thread_vectors;
-    size_t max_thread = std::thread::hardware_concurrency() * 5;
+    size_t threads_n;
+
+    if (max_thread == 0)
+    {
+        threads_n = std::thread::hardware_concurrency() * 5;
+    }
+    else if (max_thread < 0)
+    {
+        threads_n = 65535;
+    }
+    else
+    {
+        threads_n = max_thread;
+    }
 
     for (int x_itr = 0; x_itr < x_n - 1; ++x_itr)
         for (int y_itr = 0; y_itr < y_n - 1; ++y_itr)
@@ -159,7 +174,7 @@ static PyObject *GetTracedVolume(RayTracerObject *self, PyObject *args)
                                            txPos, rxPos, tx_freq, mat_perm);
                 thread_vectors.push_back(std::move(current_thread));
 
-                if (thread_vectors.size() >= max_thread)
+                if (thread_vectors.size() >= threads_n)
                 {
                     for (std::thread &thread : thread_vectors)
                         thread.join();
