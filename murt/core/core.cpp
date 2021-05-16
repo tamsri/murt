@@ -161,13 +161,11 @@ static PyObject *GetTracedVolume(RayTracerObject *self, PyObject *args)
     {
         threads_n = max_thread;
     }
-    int counter = 0;
+
     for (int x_itr = 0; x_itr < x_n; ++x_itr)
         for (int y_itr = 0; y_itr < y_n; ++y_itr)
             for (int z_itr = 0; z_itr < z_n; ++z_itr)
             {
-                printf("%d\n", ++counter);
-
                 Vec3 rxPos;
                 rxPos.x_ = x_min + x_delta * x_itr;
                 rxPos.y_ = y_min + y_delta * y_itr;
