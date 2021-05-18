@@ -17,7 +17,19 @@ class SceneGenerator():
         self.generator = np.random.default_rng(seed)
         self.globalVertices, self.globalIndice = None, None
 
-    def generate(self):
+    def generate(self, center_outdoor=False):
+        if center_outdoor is False:
+            self.generate_scene()
+        else:
+            mini_tracer = Tracer()
+            self.generate_scene()
+            mini_tracer.load_scene(*self.get_triangles())
+            tx_pos = [0.0, 0.1, 0.0]
+            while mini_tracer.is_outdoor(tx_pos) is not True:
+                self.generate_scene()
+                mini_tracer.load_scene(*self.get_triangles())
+
+    def generate_scene(self):
         self.globalVertices = None
         self.globalIndice = None
         self.sceneComponents = []
