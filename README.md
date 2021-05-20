@@ -1,6 +1,6 @@
 # MURT
 
-Multipath Radio Tracer (MURT) is a ray-tracing engine for multipath propagation of radio waves. MURT is a Python package with the ray-tracing core engine implemented in Python C++ Extension. The package also includes utility tools such as the visualizer, path loss calculator, and the scene generator.
+Multipath Radio Tracer (MURT) is a ray-tracing engine for multipath propagation of radio waves. MURT is a Python package with the ray-tracing core engine implemented in Python C++ Extension. The package also includes utility tools such as a visualizer, path loss calculator, and scene generator.
 
 ---
 
@@ -25,7 +25,7 @@ pip install murt
 2. Install MURT
 
 ```shell
-git clone https:/github.com/tamsri/murt
+git clone https://github.com/tamsri/murt
 cd murt
 pip install .
 cd ..
