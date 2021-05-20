@@ -25,7 +25,7 @@ def install():
                                   extra_compile_args=['-std=c++17'])
     setup(
         name="murt",
-        version="0.0.5",
+        version="0.0.6",
         author="Supawat Tamsri",
         python_requires='>=3.7.10',
         author_email="contact@supawat.dev",
@@ -36,7 +36,6 @@ def install():
         keywords=['Telecommunications', 'Radio', 'Ray Tracing', 'Simulation'],
         packages=['murt', 'murt.utils', 'murt.apps',
                   'murt.engine', 'murt.window'],
-        install_requires=['wheel', 'numpy>=1.20.2', 'pyglet', 'pywavefront'],
         ext_modules=[core_module, calculator_module],
         data_files=data_files,
         include_package_data=True

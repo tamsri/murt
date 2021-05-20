@@ -6,21 +6,33 @@ Multipath Radio Tracer (MURT) is a ray-tracing engine for multipath propagation 
 
 ## Installations
 
-MURT can be installed by pip, however, `numpy` is required before the installation.
+1. Install Numpy
+   Before installing MURT, make sure that `numpy` and `pandas` are installed.
+
+```shell
+pip install numpy # for installation
+pip install pandas # for calling result
+```
+
+<!-- MURT can be installed by pip, however, `numpy` is required before the installation.
 
 ! The pip installation only works with Linux and MacOS for the moment.
 
 ```shell
 pip install murt
-```
+``` -->
 
-the development version can be built via the github repository and Make.
+2. Install MURT
 
 ```shell
 git clone https:/github.com/tamsri/murt
 cd murt
-make all
+pip install .
+cd ..
+rm -rf murt
 ```
+
+Because MURT is built over C++ Extension, At the current version, MURT can be only compiled in GCC compiler.
 
 ---
 
